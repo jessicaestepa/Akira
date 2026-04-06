@@ -1,15 +1,6 @@
 import type { SellerFormData } from "@/lib/schemas/seller";
 import type { BuyerFormData } from "@/lib/schemas/buyer";
 
-function formatCurrency(value?: number) {
-  if (!value) return "—";
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(value);
-}
-
 function row(label: string, value: string | number | boolean | undefined | null) {
   const display = value === undefined || value === null || value === ""
     ? "—"
@@ -31,11 +22,9 @@ export function sellerEmailHtml(data: SellerFormData): string {
     ${row("Country", data.country)}
     ${row("Business type", data.business_type)}
     ${row("Industry", data.industry)}
-    ${row("Monthly revenue", formatCurrency(data.monthly_revenue))}
-    ${row("Monthly profit", formatCurrency(data.monthly_profit))}
-    ${row("Annual revenue", formatCurrency(data.annual_revenue_optional))}
-    ${row("Team size", data.team_size)}
-    ${row("Asking price", formatCurrency(data.asking_price))}
+    ${row("Revenue range", data.revenue_range)}
+    ${row("Profitability", data.profitability_status)}
+    ${row("Asking price range", data.asking_price_range)}
     ${row("Reason for selling", data.reason_for_selling)}
     ${row("Notes", data.additional_notes)}
     ${row("Locale", data.locale)}
@@ -59,9 +48,7 @@ export function buyerEmailHtml(data: BuyerFormData): string {
     ${row("Website / LinkedIn", data.website_or_linkedin_optional)}
     ${row("Geographies", data.preferred_geographies?.join(", "))}
     ${row("Sectors", data.preferred_sectors?.join(", "))}
-    ${row("Min check size", formatCurrency(data.min_check_size))}
-    ${row("Max check size", formatCurrency(data.max_check_size))}
-    ${row("Target revenue range", data.target_revenue_range)}
+    ${row("Check size range", data.check_size_range)}
     ${row("Acquisition interest", data.acquisition_interest)}
     ${row("Notes", data.additional_notes)}
     ${row("Locale", data.locale)}

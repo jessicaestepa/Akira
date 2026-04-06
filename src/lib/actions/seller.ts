@@ -15,12 +15,9 @@ export async function submitSellerForm(formData: FormData) {
     country: formData.get("country"),
     business_type: formData.get("business_type"),
     industry: formData.get("industry") || undefined,
-    monthly_revenue: formData.get("monthly_revenue") || undefined,
-    monthly_profit: formData.get("monthly_profit") || undefined,
-    annual_revenue_optional:
-      formData.get("annual_revenue_optional") || undefined,
-    team_size: formData.get("team_size") || undefined,
-    asking_price: formData.get("asking_price") || undefined,
+    revenue_range: formData.get("revenue_range"),
+    profitability_status: formData.get("profitability_status") || undefined,
+    asking_price_range: formData.get("asking_price_range") || undefined,
     reason_for_selling: formData.get("reason_for_selling") || undefined,
     additional_notes: formData.get("additional_notes") || undefined,
     consent_checkbox: formData.get("consent_checkbox") === "on",
@@ -41,7 +38,6 @@ export async function submitSellerForm(formData: FormData) {
     return { success: false, error: "Failed to submit. Please try again." };
   }
 
-  // Send notification email (fire-and-forget, don't block the user)
   try {
     const resend = getResend();
     if (resend && notificationEmail) {

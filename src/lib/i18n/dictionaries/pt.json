@@ -59,21 +59,21 @@
   "sell": {
     "title": "Venda sua empresa",
     "subtitle": "Conte-nos sobre seu negócio. Todas as informações são confidenciais e só são compartilhadas com compradores qualificados com seu consentimento.",
+    "step1_title": "Sobre você",
+    "step2_title": "Sobre sua empresa",
     "fields": {
       "full_name": "Nome completo",
       "email": "E-mail",
       "company_name": "Nome da empresa",
-      "website": "Site",
+      "website": "Site (opcional)",
       "country": "País",
       "business_type": "Tipo de negócio",
-      "industry": "Indústria",
-      "monthly_revenue": "Receita mensal (USD)",
-      "monthly_profit": "Lucro mensal (USD)",
-      "annual_revenue": "Receita anual (USD, opcional)",
-      "team_size": "Tamanho da equipe",
-      "asking_price": "Preço de venda (USD)",
-      "reason_for_selling": "Motivo da venda",
-      "additional_notes": "Notas adicionais",
+      "industry": "Indústria (opcional)",
+      "revenue_range": "Faixa de receita",
+      "profitability_status": "Rentabilidade (opcional)",
+      "asking_price_range": "Faixa de preço de venda (opcional)",
+      "reason_for_selling": "Motivo da venda (opcional)",
+      "additional_notes": "Notas adicionais (opcional)",
       "consent": "Eu consinto que a Akira armazene e processe estas informações para facilitar possíveis discussões de aquisição."
     },
     "placeholders": {
@@ -87,12 +87,16 @@
     },
     "note": "Todos os envios são confidenciais e revisados manualmente.",
     "success": "Seu envio foi recebido com sucesso. Entraremos em contato em breve.",
+    "next": "Próximo",
+    "back": "Voltar",
     "submit": "Enviar",
     "submitting": "Enviando..."
   },
   "buyers": {
     "title": "Acesse deals",
     "subtitle": "Conte-nos sobre seus critérios de aquisição. Conectaremos você com oportunidades relevantes do nosso pipeline curado.",
+    "step1_title": "Sobre você",
+    "step2_title": "O que você procura",
     "fields": {
       "full_name": "Nome completo",
       "email": "E-mail",
@@ -101,11 +105,9 @@
       "website_linkedin": "Site ou LinkedIn (opcional)",
       "preferred_geographies": "Geografias preferidas",
       "preferred_sectors": "Setores preferidos",
-      "min_check_size": "Cheque mínimo (USD)",
-      "max_check_size": "Cheque máximo (USD)",
-      "target_revenue_range": "Faixa de receita alvo",
-      "acquisition_interest": "Que tipo de aquisições te interessam?",
-      "additional_notes": "Notas adicionais",
+      "check_size_range": "Faixa de cheque",
+      "acquisition_interest": "Que tipo de aquisições te interessam? (opcional)",
+      "additional_notes": "Notas adicionais (opcional)",
       "consent": "Eu consinto que a Akira armazene e processe estas informações para facilitar o acesso a deals."
     },
     "placeholders": {
@@ -113,12 +115,13 @@
       "email": "voce@empresa.com",
       "firm_name": "Nome da sua firma ou fundo",
       "website_linkedin": "https://linkedin.com/in/seuperfil",
-      "target_revenue_range": "ex., $500K - $2M ARR",
       "acquisition_interest": "Descreva sua aquisição ideal",
       "additional_notes": "Qualquer outra informação relevante"
     },
     "note": "Diga-nos o que você procura e compartilharemos oportunidades relevantes.",
     "success": "Seu envio foi recebido com sucesso. Entraremos em contato em breve.",
+    "next": "Próximo",
+    "back": "Voltar",
     "submit": "Enviar",
     "submitting": "Enviando..."
   },
@@ -188,6 +191,32 @@
       "marketplace": "Marketplace",
       "agency": "Agência / Serviços",
       "other": "Outro"
+    },
+    "revenue_ranges": {
+      "pre_revenue": "Pré-receita",
+      "under_5k": "Menos de $5K MRR",
+      "5k_20k": "$5K – $20K MRR",
+      "20k_50k": "$20K – $50K MRR",
+      "50k_plus": "$50K+ MRR"
+    },
+    "profitability": {
+      "profitable": "Rentável",
+      "break_even": "Ponto de equilíbrio",
+      "not_profitable": "Não rentável ainda"
+    },
+    "asking_price_ranges": {
+      "under_100k": "Menos de $100K",
+      "100k_250k": "$100K – $250K",
+      "250k_500k": "$250K – $500K",
+      "500k_1m": "$500K – $1M",
+      "1m_plus": "$1M+"
+    },
+    "check_size_ranges": {
+      "under_100k": "Menos de $100K",
+      "100k_250k": "$100K – $250K",
+      "250k_500k": "$250K – $500K",
+      "500k_1m": "$500K – $1M",
+      "1m_plus": "$1M+"
     },
     "error": "Algo deu errado. Por favor, tente novamente.",
     "required": "Este campo é obrigatório."

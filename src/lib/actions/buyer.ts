@@ -16,9 +16,7 @@ export async function submitBuyerForm(formData: FormData) {
       formData.get("website_or_linkedin_optional") || undefined,
     preferred_geographies: formData.getAll("preferred_geographies"),
     preferred_sectors: formData.getAll("preferred_sectors"),
-    min_check_size: formData.get("min_check_size") || undefined,
-    max_check_size: formData.get("max_check_size") || undefined,
-    target_revenue_range: formData.get("target_revenue_range") || undefined,
+    check_size_range: formData.get("check_size_range"),
     acquisition_interest: formData.get("acquisition_interest") || undefined,
     additional_notes: formData.get("additional_notes") || undefined,
     consent_checkbox: formData.get("consent_checkbox") === "on",
@@ -39,7 +37,6 @@ export async function submitBuyerForm(formData: FormData) {
     return { success: false, error: "Failed to submit. Please try again." };
   }
 
-  // Send notification email (fire-and-forget, don't block the user)
   try {
     const resend = getResend();
     if (resend && notificationEmail) {

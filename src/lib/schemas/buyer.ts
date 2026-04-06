@@ -9,9 +9,7 @@ export const buyerSchema = z.object({
   website_or_linkedin_optional: z.string().url().optional().or(z.literal("")),
   preferred_geographies: z.array(z.string()).min(1, "Select at least one"),
   preferred_sectors: z.array(z.string()).min(1, "Select at least one"),
-  min_check_size: z.coerce.number().nonnegative().optional(),
-  max_check_size: z.coerce.number().nonnegative().optional(),
-  target_revenue_range: z.string().optional().or(z.literal("")),
+  check_size_range: z.string().min(1, "Required"),
   acquisition_interest: z.string().optional().or(z.literal("")),
   additional_notes: z.string().optional().or(z.literal("")),
   consent_checkbox: z.literal(true, {
