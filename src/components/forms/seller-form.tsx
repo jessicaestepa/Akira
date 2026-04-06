@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { submitSellerForm } from "@/lib/actions/seller";
+import { getCurrencyForCountry } from "@/lib/currency-config";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
 import type { Locale } from "@/lib/i18n/config";
 
@@ -34,6 +34,9 @@ export function SellerForm({ locale, dict }: SellerFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [consent, setConsent] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState("");
+
+  const currency = getCurrencyForCountry(selectedCountry);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -41,15 +44,39 @@ export function SellerForm({ locale, dict }: SellerFormProps) {
     setError(null);
 
     const form = e.currentTarget;
-    const formData = new FormData(form);
-    if (consent) formData.set("consent_checkbox", "on");
-    else formData.delete("consent_checkbox");
+    const fd = new FormData(form);
 
-    const result = await submitSellerForm(formData);
-    if (result.success) {
-      setSuccess(true);
-    } else {
-      setError(result.error || dict.common.error);
+    const payload = {
+      locale: fd.get("locale"),
+      full_name: fd.get("full_name"),
+      email: fd.get("email"),
+      company_name: fd.get("company_name"),
+      website: fd.get("website") || undefined,
+      country: fd.get("country"),
+      business_type: fd.get("business_type"),
+      industry: fd.get("industry") || undefined,
+      revenue_range: fd.get("revenue_range"),
+      profitability_status: fd.get("profitability_status") || undefined,
+      asking_price_range: fd.get("asking_price_range") || undefined,
+      reason_for_selling: fd.get("reason_for_selling") || undefined,
+      additional_notes: fd.get("additional_notes") || undefined,
+      consent_checkbox: consent,
+    };
+
+    try {
+      const res = await fetch("/api/seller", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setSuccess(true);
+      } else {
+        setError(data.error || dict.common.error);
+      }
+    } catch {
+      setError(dict.common.error);
     }
     setLoading(false);
   }
@@ -121,7 +148,7 @@ export function SellerForm({ locale, dict }: SellerFormProps) {
           <div className="flex flex-wrap gap-2">
             {countries.map((c) => (
               <label key={c} className="relative">
-                <input type="radio" name="country" value={c} required className="peer sr-only" />
+                <input type="radio" name="country" value={c} required className="peer sr-only" onChange={() => setSelectedCountry(c)} />
                 <span className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border border-input bg-background cursor-pointer transition-colors hover:bg-muted peer-checked:bg-primary peer-checked:text-primary-foreground peer-checked:border-primary">
                   <span>{countryFlags[c]}</span>
                   {dict.common.countries[c]}
@@ -131,7 +158,32 @@ export function SellerForm({ locale, dict }: SellerFormProps) {
           </div>
         </div>
 
-        <Button type="button" onClick={() => setStep(2)} className="gap-2">
+        <Button
+          type="button"
+          className="gap-2"
+          onClick={() => {
+            const form = document.querySelector("form") as HTMLFormElement | null;
+            if (!form) return;
+            const name = form.querySelector<HTMLInputElement>('[name="full_name"]');
+            const email = form.querySelector<HTMLInputElement>('[name="email"]');
+            const company = form.querySelector<HTMLInputElement>('[name="company_name"]');
+            const country = form.querySelector<HTMLInputElement>('[name="country"]:checked');
+
+            if (!name?.value.trim() || !email?.value.trim() || !company?.value.trim() || !country) {
+              [name, email, company].forEach((el) => el?.reportValidity());
+              if (!country) {
+                setError(dict.common.required);
+              }
+              return;
+            }
+            if (!email.checkValidity()) {
+              email.reportValidity();
+              return;
+            }
+            setError(null);
+            setStep(2);
+          }}
+        >
           {t.next} <ArrowRight className="h-4 w-4" />
         </Button>
       </div>
@@ -156,11 +208,17 @@ export function SellerForm({ locale, dict }: SellerFormProps) {
 
         <div className="grid gap-5 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="revenue_range">{t.fields.revenue_range} *</Label>
+            <Label htmlFor="revenue_range">
+              {t.fields.revenue_range}{selectedCountry ? ` (${currency.code})` : ""} *
+            </Label>
             <select id="revenue_range" name="revenue_range" required className={selectClass}>
               <option value="">{dict.common.select_type}</option>
               {revenueRanges.map((r) => (
-                <option key={r} value={r}>{dict.common.revenue_ranges[r]}</option>
+                <option key={r} value={r}>
+                  {r === "pre_revenue"
+                    ? dict.common.revenue_ranges.pre_revenue
+                    : currency.revenue[r] ?? dict.common.revenue_ranges[r]}
+                </option>
               ))}
             </select>
           </div>
@@ -176,11 +234,15 @@ export function SellerForm({ locale, dict }: SellerFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="asking_price_range">{t.fields.asking_price_range}</Label>
+          <Label htmlFor="asking_price_range">
+            {t.fields.asking_price_range}{selectedCountry ? ` (${currency.code})` : ""}
+          </Label>
           <select id="asking_price_range" name="asking_price_range" className={selectClass}>
             <option value="">{dict.common.select_type}</option>
             {askingPriceRanges.map((a) => (
-              <option key={a} value={a}>{dict.common.asking_price_ranges[a]}</option>
+              <option key={a} value={a}>
+                {currency.askingPrice[a] ?? dict.common.asking_price_ranges[a]}
+              </option>
             ))}
           </select>
         </div>

@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { submitBuyerForm } from "@/lib/actions/buyer";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
 import type { Locale } from "@/lib/i18n/config";
 
@@ -46,19 +45,38 @@ export function BuyerForm({ locale, dict }: BuyerFormProps) {
     setError(null);
 
     const form = e.currentTarget;
-    const formData = new FormData(form);
-    formData.delete("preferred_geographies");
-    formData.delete("preferred_sectors");
-    selectedGeos.forEach((g) => formData.append("preferred_geographies", g));
-    selectedSectors.forEach((s) => formData.append("preferred_sectors", s));
-    if (consent) formData.set("consent_checkbox", "on");
-    else formData.delete("consent_checkbox");
+    const fd = new FormData(form);
 
-    const result = await submitBuyerForm(formData);
-    if (result.success) {
-      setSuccess(true);
-    } else {
-      setError(result.error || dict.common.error);
+    const payload = {
+      locale: fd.get("locale"),
+      full_name: fd.get("full_name"),
+      email: fd.get("email"),
+      firm_name_optional: fd.get("firm_name_optional") || undefined,
+      buyer_type: fd.get("buyer_type"),
+      website_or_linkedin_optional:
+        fd.get("website_or_linkedin_optional") || undefined,
+      preferred_geographies: selectedGeos,
+      preferred_sectors: selectedSectors,
+      check_size_range: fd.get("check_size_range"),
+      acquisition_interest: fd.get("acquisition_interest") || undefined,
+      additional_notes: fd.get("additional_notes") || undefined,
+      consent_checkbox: consent,
+    };
+
+    try {
+      const res = await fetch("/api/buyer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setSuccess(true);
+      } else {
+        setError(data.error || dict.common.error);
+      }
+    } catch {
+      setError(dict.common.error);
     }
     setLoading(false);
   }
@@ -134,7 +152,28 @@ export function BuyerForm({ locale, dict }: BuyerFormProps) {
           <Input id="website_or_linkedin_optional" name="website_or_linkedin_optional" type="url" placeholder={t.placeholders.website_linkedin} />
         </div>
 
-        <Button type="button" onClick={() => setStep(2)} className="gap-2">
+        <Button
+          type="button"
+          className="gap-2"
+          onClick={() => {
+            const form = document.querySelector("form") as HTMLFormElement | null;
+            if (!form) return;
+            const name = form.querySelector<HTMLInputElement>('[name="full_name"]');
+            const email = form.querySelector<HTMLInputElement>('[name="email"]');
+            const buyerType = form.querySelector<HTMLSelectElement>('[name="buyer_type"]');
+
+            if (!name?.value.trim() || !email?.value.trim() || !buyerType?.value) {
+              [name, email, buyerType].forEach((el) => el?.reportValidity());
+              return;
+            }
+            if (!email.checkValidity()) {
+              email.reportValidity();
+              return;
+            }
+            setError(null);
+            setStep(2);
+          }}
+        >
           {t.next} <ArrowRight className="h-4 w-4" />
         </Button>
       </div>

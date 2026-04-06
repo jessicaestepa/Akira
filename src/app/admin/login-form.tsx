@@ -20,7 +20,10 @@ export function AdminLoginForm() {
 
     const res = await fetch("/api/admin/login", {
       method: "POST",
-      body: JSON.stringify({ password: formData.get("password") }),
+      body: JSON.stringify({
+        username: formData.get("username"),
+        password: formData.get("password"),
+      }),
       headers: { "Content-Type": "application/json" },
     });
 
@@ -28,7 +31,7 @@ export function AdminLoginForm() {
       router.push("/admin/sellers");
       router.refresh();
     } else {
-      setError("Invalid password");
+      setError("Invalid credentials");
       setLoading(false);
     }
   }
@@ -41,13 +44,24 @@ export function AdminLoginForm() {
         </div>
       )}
       <div className="space-y-2">
+        <Label htmlFor="username">Username</Label>
+        <Input
+          id="username"
+          name="username"
+          required
+          placeholder="Admin username"
+          autoComplete="username"
+        />
+      </div>
+      <div className="space-y-2">
         <Label htmlFor="password">Password</Label>
         <Input
           id="password"
           name="password"
           type="password"
           required
-          placeholder="Enter admin password"
+          placeholder="Admin password"
+          autoComplete="current-password"
         />
       </div>
       <Button type="submit" className="w-full" disabled={loading}>

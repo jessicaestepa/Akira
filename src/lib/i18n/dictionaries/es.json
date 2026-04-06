@@ -69,9 +69,9 @@
       "country": "País",
       "business_type": "Tipo de negocio",
       "industry": "Industria (opcional)",
-      "revenue_range": "Rango de ingresos",
+      "revenue_range": "Ventas mensuales",
       "profitability_status": "Rentabilidad (opcional)",
-      "asking_price_range": "Rango de precio de venta (opcional)",
+      "asking_price_range": "Rango de precio",
       "reason_for_selling": "Razón para vender (opcional)",
       "additional_notes": "Notas adicionales (opcional)",
       "consent": "Consiento que Akira almacene y procese esta información para facilitar posibles discusiones de adquisición."
@@ -105,7 +105,7 @@
       "website_linkedin": "Sitio web o LinkedIn (opcional)",
       "preferred_geographies": "Geografías preferidas",
       "preferred_sectors": "Sectores preferidos",
-      "check_size_range": "Rango de cheque",
+      "check_size_range": "Rango de inversión (USD)",
       "acquisition_interest": "¿Qué tipo de adquisiciones te interesan? (opcional)",
       "additional_notes": "Notas adicionales (opcional)",
       "consent": "Consiento que Akira almacene y procese esta información para facilitar el acceso a deals."
@@ -130,7 +130,7 @@
     "subtitle": "Explora oportunidades de adquisición curadas en América Latina. Solicita una introducción para conocer más sobre cualquier deal.",
     "empty": "No hay oportunidades disponibles en este momento. Vuelve pronto.",
     "request_intro": "Solicitar detalles",
-    "revenue": "Ingreso mensual",
+    "revenue": "Ventas mensuales",
     "profit": "Ganancia mensual",
     "asking": "Precio de venta",
     "sector": "Sector",
@@ -194,10 +194,10 @@
     },
     "revenue_ranges": {
       "pre_revenue": "Pre-ingreso",
-      "under_5k": "Menos de $5K MRR",
-      "5k_20k": "$5K – $20K MRR",
-      "20k_50k": "$20K – $50K MRR",
-      "50k_plus": "$50K+ MRR"
+      "under_5k": "Menos de US$5K / mes",
+      "5k_20k": "US$5K – US$20K / mes",
+      "20k_50k": "US$20K – US$50K / mes",
+      "50k_plus": "US$50K+ / mes"
     },
     "profitability": {
       "profitable": "Rentable",
@@ -205,18 +205,18 @@
       "not_profitable": "No rentable aún"
     },
     "asking_price_ranges": {
-      "under_100k": "Menos de $100K",
-      "100k_250k": "$100K – $250K",
-      "250k_500k": "$250K – $500K",
-      "500k_1m": "$500K – $1M",
-      "1m_plus": "$1M+"
+      "under_100k": "Menos de US$100K",
+      "100k_250k": "US$100K – US$250K",
+      "250k_500k": "US$250K – US$500K",
+      "500k_1m": "US$500K – US$1M",
+      "1m_plus": "US$1M+"
     },
     "check_size_ranges": {
-      "under_100k": "Menos de $100K",
-      "100k_250k": "$100K – $250K",
-      "250k_500k": "$250K – $500K",
-      "500k_1m": "$500K – $1M",
-      "1m_plus": "$1M+"
+      "under_100k": "Menos de US$100K",
+      "100k_250k": "US$100K – US$250K",
+      "250k_500k": "US$250K – US$500K",
+      "500k_1m": "US$500K – US$1M",
+      "1m_plus": "US$1M+"
     },
     "error": "Algo salió mal. Por favor intenta de nuevo.",
     "required": "Este campo es obligatorio."

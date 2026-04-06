@@ -20,7 +20,7 @@ const SAMPLE_DEALS: Deal[] = [
     asking_price: 3500000,
     summary: null,
     teaser:
-      "Profitable SaaS with $85K MRR serving logistics companies in Mexico. 90%+ gross margins, 120+ customers, and 18 months of consecutive growth.",
+      "Profitable SaaS with $85K in monthly sales serving logistics companies in Mexico. 90%+ gross margins, 120+ customers, and 18 months of consecutive growth.",
     is_public: true,
     status: "live",
   },
@@ -60,7 +60,7 @@ const SAMPLE_DEALS: Deal[] = [
     asking_price: 7000000,
     summary: null,
     teaser:
-      "Fintech infrastructure company with $200K MRR. Serves 15+ financial institutions in Brazil with regulated API products and strong pipeline.",
+      "Fintech infrastructure company with $200K in monthly sales. Serves 15+ financial institutions in Brazil with regulated API products and strong pipeline.",
     is_public: true,
     status: "live",
   },
