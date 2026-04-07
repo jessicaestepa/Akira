@@ -209,7 +209,7 @@ export default async function HomePage({
               href={`/${locale}/buyers`}
               className={cn(
                 buttonVariants({ variant: "outline", size: "lg" }),
-                "text-base px-8 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
+                "text-base px-8 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary"
               )}
             >
               {dict.home.cta.cta_buy}
