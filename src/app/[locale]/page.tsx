@@ -207,10 +207,7 @@ export default async function HomePage({
             </Link>
             <Link
               href={`/${locale}/buyers`}
-              className={cn(
-                buttonVariants({ variant: "outline", size: "lg" }),
-                "text-base px-8 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary"
-              )}
+              className="inline-flex items-center justify-center h-9 px-8 text-base font-medium rounded-lg border border-white text-white transition-colors hover:bg-white hover:text-black"
             >
               {dict.home.cta.cta_buy}
             </Link>
