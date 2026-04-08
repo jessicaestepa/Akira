@@ -9,7 +9,7 @@
   "home": {
     "hero": {
       "title": "Buy or sell private companies in Latin America",
-      "subtitle": "Aquira helps founders explore liquidity and helps buyers access curated acquisition opportunities across Latin America.",
+      "subtitle": "Aqüira helps founders explore liquidity and helps buyers access curated acquisition opportunities across Latin America.",
       "cta_sell": "Sell your company",
       "cta_buy": "Browse opportunities"
     },
@@ -17,16 +17,16 @@
       "title": "How it works",
       "step1_title": "Submit your profile",
       "step1_desc": "Founders submit their company details. Buyers submit their acquisition criteria.",
-      "step2_title": "Aquira reviews",
+      "step2_title": "Aqüira reviews",
       "step2_desc": "Our team qualifies every submission to ensure quality and relevance.",
       "step3_title": "Access curated deals",
       "step3_desc": "Qualified buyers get access to vetted acquisition opportunities.",
       "step4_title": "Get introduced",
-      "step4_desc": "Aquira facilitates relevant introductions between qualified parties."
+      "step4_desc": "Aqüira facilitates relevant introductions between qualified parties."
     },
     "sellers": {
       "title": "For sellers",
-      "subtitle": "Exploring a sale shouldn't be complicated. Aquira gives you a confidential, structured way to connect with serious buyers.",
+      "subtitle": "Exploring a sale shouldn't be complicated. Aqüira gives you a confidential, structured way to connect with serious buyers.",
       "benefit1": "Confidential process",
       "benefit2": "Access to qualified buyers",
       "benefit3": "Cross-border reach across Latin America and beyond"
@@ -39,7 +39,7 @@
       "benefit3": "Faster access to quality dealflow"
     },
     "benefits": {
-      "title": "Why Aquira",
+      "title": "Why Aqüira",
       "b1_title": "LATAM focused",
       "b1_desc": "Deep focus on Latin American private companies across key sectors.",
       "b2_title": "Curated quality",
@@ -51,7 +51,7 @@
     },
     "cta": {
       "title": "Ready to explore?",
-      "subtitle": "Whether you're looking to sell or acquire, Aquira is the simplest way to start.",
+      "subtitle": "Whether you're looking to sell or acquire, Aqüira is the simplest way to start.",
       "cta_sell": "Submit your company",
       "cta_buy": "Join as a buyer"
     }
@@ -74,7 +74,7 @@
       "asking_price_range": "Asking price range",
       "reason_for_selling": "Reason for selling (optional)",
       "additional_notes": "Additional notes (optional)",
-      "consent": "I consent to Aquira storing and processing this information to facilitate potential acquisition discussions."
+      "consent": "I consent to Aqüira storing and processing this information to facilitate potential acquisition discussions."
     },
     "placeholders": {
       "full_name": "Your full name",
@@ -108,7 +108,7 @@
       "check_size_range": "Check size range (USD)",
       "acquisition_interest": "What kind of acquisitions interest you? (optional)",
       "additional_notes": "Additional notes (optional)",
-      "consent": "I consent to Aquira storing and processing this information to facilitate deal access."
+      "consent": "I consent to Aqüira storing and processing this information to facilitate deal access."
     },
     "placeholders": {
       "full_name": "Your full name",
@@ -143,7 +143,7 @@
   },
   "privacy": {
     "title": "Privacy Policy",
-    "content": "Aquira (\"we\", \"us\", or \"our\") is committed to protecting your privacy. This policy explains how we collect, use, and safeguard your personal information.\n\n**Information we collect:** We collect information you provide through our forms, including your name, email, company details, and financial information relevant to potential transactions.\n\n**How we use it:** Your information is used solely to facilitate potential acquisition discussions between qualified parties. We do not sell your data.\n\n**Data storage:** Your data is stored securely using industry-standard encryption and access controls.\n\n**Confidentiality:** Company details submitted by sellers are only shared with qualified buyers and only with the seller's consent.\n\n**Contact:** For privacy-related questions, reach out to us at privacy@aquira.lat\n\nLast updated: April 2026"
+    "content": "Aqüira (\"we\", \"us\", or \"our\") is committed to protecting your privacy. This policy explains how we collect, use, and safeguard your personal information.\n\n**Information we collect:** We collect information you provide through our forms, including your name, email, company details, and financial information relevant to potential transactions.\n\n**How we use it:** Your information is used solely to facilitate potential acquisition discussions between qualified parties. We do not sell your data.\n\n**Data storage:** Your data is stored securely using industry-standard encryption and access controls.\n\n**Confidentiality:** Company details submitted by sellers are only shared with qualified buyers and only with the seller's consent.\n\n**Contact:** For privacy-related questions, reach out to us at privacy@aqüira.lat\n\nLast updated: April 2026"
   },
   "footer": {
     "tagline": "Curated acquisitions in Latin America.",

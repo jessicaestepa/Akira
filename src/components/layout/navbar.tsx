@@ -38,7 +38,7 @@ export function Navbar({ locale, dict }: NavbarProps) {
             href={`/${locale}`}
             className="text-xl font-semibold tracking-tight"
           >
-            Aquira
+            Aqüira
           </Link>
 
           {/* Desktop nav */}

@@ -8,7 +8,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Aquira — Curated Acquisitions in Latin America",
+  title: "Aqüira — Curated Acquisitions in Latin America",
   description:
     "A curated marketplace for acquiring private companies in Latin America. Explore vetted acquisition opportunities across LATAM.",
 };

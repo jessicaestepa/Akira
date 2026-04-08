@@ -1,4 +1,4 @@
--- Aquira MVP: Initial database schema
+-- Aqüira MVP: Initial database schema
 
 -- Seller leads
 create table if not exists seller_leads (

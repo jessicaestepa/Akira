@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { locales, defaultLocale } from "@/lib/i18n/config";
 
-const SESSION_COOKIE = "aquira_admin_auth";
-const SIGNING_PREFIX = "aquira_session_v1:";
+const SESSION_COOKIE = "aqüira_admin_auth";
+const SIGNING_PREFIX = "aqüira_session_v1:";
 
 async function expectedToken(): Promise<string | null> {
   const password = process.env.ADMIN_PASSWORD;

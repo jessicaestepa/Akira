@@ -9,7 +9,7 @@
   "home": {
     "hero": {
       "title": "Compre ou venda empresas privadas na América Latina",
-      "subtitle": "A Aquira ajuda fundadores a explorar liquidez e compradores a acessar oportunidades curadas de aquisição na América Latina.",
+      "subtitle": "A Aqüira ajuda fundadores a explorar liquidez e compradores a acessar oportunidades curadas de aquisição na América Latina.",
       "cta_sell": "Venda sua empresa",
       "cta_buy": "Explore oportunidades"
     },
@@ -17,16 +17,16 @@
       "title": "Como funciona",
       "step1_title": "Envie seu perfil",
       "step1_desc": "Fundadores enviam os detalhes da empresa. Compradores enviam seus critérios de aquisição.",
-      "step2_title": "Aquira revisa",
+      "step2_title": "Aqüira revisa",
       "step2_desc": "Nossa equipe qualifica cada envio para garantir qualidade e relevância.",
       "step3_title": "Acesse deals curados",
       "step3_desc": "Compradores qualificados acessam oportunidades de aquisição verificadas.",
       "step4_title": "Receba uma introdução",
-      "step4_desc": "Aquira facilita introduções relevantes entre partes qualificadas."
+      "step4_desc": "Aqüira facilita introduções relevantes entre partes qualificadas."
     },
     "sellers": {
       "title": "Para vendedores",
-      "subtitle": "Explorar uma venda não deveria ser complicado. Aquira oferece um processo confidencial e estruturado para conectar com compradores sérios.",
+      "subtitle": "Explorar uma venda não deveria ser complicado. Aqüira oferece um processo confidencial e estruturado para conectar com compradores sérios.",
       "benefit1": "Processo confidencial",
       "benefit2": "Acesso a compradores qualificados",
       "benefit3": "Alcance transfronteiriço na América Latina e além"
@@ -39,7 +39,7 @@
       "benefit3": "Acesso mais rápido a dealflow de qualidade"
     },
     "benefits": {
-      "title": "Por que Aquira",
+      "title": "Por que Aqüira",
       "b1_title": "Foco na LATAM",
       "b1_desc": "Foco profundo em empresas privadas da América Latina em setores-chave.",
       "b2_title": "Qualidade curada",
@@ -51,7 +51,7 @@
     },
     "cta": {
       "title": "Pronto para explorar?",
-      "subtitle": "Seja para vender ou adquirir, Aquira é a forma mais simples de começar.",
+      "subtitle": "Seja para vender ou adquirir, Aqüira é a forma mais simples de começar.",
       "cta_sell": "Envie sua empresa",
       "cta_buy": "Junte-se como comprador"
     }
@@ -74,7 +74,7 @@
       "asking_price_range": "Faixa de preço",
       "reason_for_selling": "Motivo da venda (opcional)",
       "additional_notes": "Notas adicionais (opcional)",
-      "consent": "Eu consinto que a Aquira armazene e processe estas informações para facilitar possíveis discussões de aquisição."
+      "consent": "Eu consinto que a Aqüira armazene e processe estas informações para facilitar possíveis discussões de aquisição."
     },
     "placeholders": {
       "full_name": "Seu nome completo",
@@ -108,7 +108,7 @@
       "check_size_range": "Faixa de investimento (BRL)",
       "acquisition_interest": "Que tipo de aquisições te interessam? (opcional)",
       "additional_notes": "Notas adicionais (opcional)",
-      "consent": "Eu consinto que a Aquira armazene e processe estas informações para facilitar o acesso a deals."
+      "consent": "Eu consinto que a Aqüira armazene e processe estas informações para facilitar o acesso a deals."
     },
     "placeholders": {
       "full_name": "Seu nome completo",
@@ -143,7 +143,7 @@
   },
   "privacy": {
     "title": "Política de Privacidade",
-    "content": "Aquira (\"nós\") está comprometida em proteger sua privacidade. Esta política explica como coletamos, usamos e protegemos suas informações pessoais.\n\n**Informações que coletamos:** Coletamos as informações que você fornece através dos nossos formulários, incluindo nome, e-mail, detalhes da empresa e informações financeiras relevantes para possíveis transações.\n\n**Como usamos:** Suas informações são usadas exclusivamente para facilitar possíveis discussões de aquisição entre partes qualificadas. Não vendemos seus dados.\n\n**Armazenamento:** Seus dados são armazenados de forma segura usando criptografia padrão da indústria e controles de acesso.\n\n**Confidencialidade:** Os detalhes das empresas enviados pelos vendedores só são compartilhados com compradores qualificados e somente com o consentimento do vendedor.\n\n**Contato:** Para questões sobre privacidade, entre em contato em privacy@aquira.lat\n\nÚltima atualização: Abril 2026"
+    "content": "Aqüira (\"nós\") está comprometida em proteger sua privacidade. Esta política explica como coletamos, usamos e protegemos suas informações pessoais.\n\n**Informações que coletamos:** Coletamos as informações que você fornece através dos nossos formulários, incluindo nome, e-mail, detalhes da empresa e informações financeiras relevantes para possíveis transações.\n\n**Como usamos:** Suas informações são usadas exclusivamente para facilitar possíveis discussões de aquisição entre partes qualificadas. Não vendemos seus dados.\n\n**Armazenamento:** Seus dados são armazenados de forma segura usando criptografia padrão da indústria e controles de acesso.\n\n**Confidencialidade:** Os detalhes das empresas enviados pelos vendedores só são compartilhados com compradores qualificados e somente com o consentimento do vendedor.\n\n**Contato:** Para questões sobre privacidade, entre em contato em privacy@aqüira.lat\n\nÚltima atualização: Abril 2026"
   },
   "footer": {
     "tagline": "Aquisições curadas na América Latina.",

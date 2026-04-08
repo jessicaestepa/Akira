@@ -13,7 +13,7 @@ export function Footer({ locale, dict }: FooterProps) {
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
-            <span className="font-semibold tracking-tight">Aquira</span>
+            <span className="font-semibold tracking-tight">Aqüira</span>
             <span className="text-sm text-muted-foreground">
               {dict.footer.tagline}
             </span>
@@ -26,7 +26,7 @@ export function Footer({ locale, dict }: FooterProps) {
               {dict.footer.privacy}
             </Link>
             <span>
-              &copy; {new Date().getFullYear()} Aquira. {dict.footer.rights}
+              &copy; {new Date().getFullYear()} Aqüira. {dict.footer.rights}
             </span>
           </div>
         </div>

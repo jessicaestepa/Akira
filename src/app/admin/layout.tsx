@@ -14,7 +14,7 @@ export default function AdminLayout({
               href="/admin"
               className="text-lg font-semibold tracking-tight"
             >
-              Aquira <span className="text-muted-foreground font-normal text-sm">Admin</span>
+              Aqüira <span className="text-muted-foreground font-normal text-sm">Admin</span>
             </Link>
             <div className="flex items-center gap-6 text-sm">
               <Link

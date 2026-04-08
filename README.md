@@ -1,4 +1,4 @@
-# Aquira
+# Aqüira
 
 A curated marketplace for acquiring private companies in Latin America.
 
@@ -22,8 +22,8 @@ A curated marketplace for acquiring private companies in Latin America.
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/jessicaestepa/Aquira.git
-cd Aquira
+git clone https://github.com/jessicaestepa/Aqüira.git
+cd Aqüira
 ```
 
 ### 2. Install dependencies

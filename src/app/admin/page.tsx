@@ -4,7 +4,7 @@ import { AdminLoginForm } from "./login-form";
 
 export default async function AdminPage() {
   const cookieStore = await cookies();
-  const auth = cookieStore.get("aquira_admin_auth");
+  const auth = cookieStore.get("aqüira_admin_auth");
 
   if (auth?.value === "authenticated") {
     redirect("/admin/sellers");

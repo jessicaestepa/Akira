@@ -12,7 +12,7 @@ export function sellerEmailHtml(data: SellerFormData): string {
   return `
 <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a">
   <h2 style="font-size:20px;font-weight:600;margin-bottom:4px">New Seller Submission</h2>
-  <p style="color:#666;font-size:14px;margin-top:0">A new company has been submitted on Aquira.</p>
+  <p style="color:#666;font-size:14px;margin-top:0">A new company has been submitted on Aqüira.</p>
   <hr style="border:none;border-top:1px solid #e5e5e5;margin:16px 0" />
   <table style="font-size:14px;border-collapse:collapse;width:100%">
     ${row("Name", data.full_name)}
@@ -30,7 +30,7 @@ export function sellerEmailHtml(data: SellerFormData): string {
     ${row("Locale", data.locale)}
   </table>
   <hr style="border:none;border-top:1px solid #e5e5e5;margin:16px 0" />
-  <p style="color:#999;font-size:12px">This is an automated notification from Aquira.</p>
+  <p style="color:#999;font-size:12px">This is an automated notification from Aqüira.</p>
 </div>`;
 }
 
@@ -38,7 +38,7 @@ export function buyerEmailHtml(data: BuyerFormData): string {
   return `
 <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a">
   <h2 style="font-size:20px;font-weight:600;margin-bottom:4px">New Buyer Submission</h2>
-  <p style="color:#666;font-size:14px;margin-top:0">A new buyer has requested access on Aquira.</p>
+  <p style="color:#666;font-size:14px;margin-top:0">A new buyer has requested access on Aqüira.</p>
   <hr style="border:none;border-top:1px solid #e5e5e5;margin:16px 0" />
   <table style="font-size:14px;border-collapse:collapse;width:100%">
     ${row("Name", data.full_name)}
@@ -54,6 +54,6 @@ export function buyerEmailHtml(data: BuyerFormData): string {
     ${row("Locale", data.locale)}
   </table>
   <hr style="border:none;border-top:1px solid #e5e5e5;margin:16px 0" />
-  <p style="color:#999;font-size:12px">This is an automated notification from Aquira.</p>
+  <p style="color:#999;font-size:12px">This is an automated notification from Aqüira.</p>
 </div>`;
 }
