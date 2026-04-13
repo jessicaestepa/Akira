@@ -36,7 +36,7 @@ export function Navbar({ locale, dict }: NavbarProps) {
         <div className="flex h-16 items-center justify-between">
           <Link
             href={`/${locale}`}
-            className="text-2xl font-bold tracking-tight"
+            className="text-2xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent"
           >
             Aqüira
           </Link>
@@ -47,9 +47,9 @@ export function Navbar({ locale, dict }: NavbarProps) {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`text-sm transition-colors hover:text-foreground ${
+                className={`text-sm transition-colors hover:text-primary ${
                   pathname === link.href
-                    ? "text-foreground font-medium"
+                    ? "text-primary font-medium"
                     : "text-muted-foreground"
                 }`}
               >
@@ -66,8 +66,8 @@ export function Navbar({ locale, dict }: NavbarProps) {
                   href={switchLocalePath(l)}
                   className={`px-1.5 py-0.5 rounded transition-colors ${
                     l === locale
-                      ? "text-foreground font-medium"
-                      : "hover:text-foreground"
+                      ? "text-primary font-medium"
+                      : "hover:text-primary"
                   }`}
                 >
                   {l.toUpperCase()}
@@ -100,8 +100,8 @@ export function Navbar({ locale, dict }: NavbarProps) {
                 onClick={() => setMobileOpen(false)}
                 className={`block px-2 py-2 text-sm rounded transition-colors ${
                   pathname === link.href
-                    ? "text-foreground font-medium bg-muted"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "text-primary font-medium bg-primary/10"
+                    : "text-muted-foreground hover:text-primary"
                 }`}
               >
                 {link.label}
@@ -116,8 +116,8 @@ export function Navbar({ locale, dict }: NavbarProps) {
                   onClick={() => setMobileOpen(false)}
                   className={`px-2 py-1 rounded ${
                     l === locale
-                      ? "text-foreground font-medium"
-                      : "hover:text-foreground"
+                      ? "text-primary font-medium"
+                      : "hover:text-primary"
                   }`}
                 >
                   {l.toUpperCase()}

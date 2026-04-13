@@ -12,26 +12,31 @@ export default function AdminLayout({
           <div className="flex h-14 items-center gap-8">
             <Link
               href="/admin"
-              className="text-lg font-semibold tracking-tight"
+              className="text-lg font-semibold tracking-tight inline-flex items-baseline gap-1.5"
             >
-              Aqüira <span className="text-muted-foreground font-normal text-sm">Admin</span>
+              <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                Aqüira
+              </span>
+              <span className="text-muted-foreground font-normal text-sm">
+                Admin
+              </span>
             </Link>
             <div className="flex items-center gap-6 text-sm">
               <Link
                 href="/admin/sellers"
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground hover:text-primary transition-colors"
               >
                 Sellers
               </Link>
               <Link
                 href="/admin/buyers"
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground hover:text-primary transition-colors"
               >
                 Buyers
               </Link>
               <Link
                 href="/admin/deals"
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground hover:text-primary transition-colors"
               >
                 Deals
               </Link>

@@ -57,8 +57,12 @@ export default async function HomePage({
     <div>
       {/* Hero */}
       <section className="relative py-20 sm:py-28 lg:py-36 overflow-hidden">
-        <LatamMap className="absolute right-[2%] top-1/2 -translate-y-1/2 h-[120%] w-auto text-primary pointer-events-none select-none hidden md:block" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/30 pointer-events-none" />
+        <div
+          className="absolute -right-24 top-1/4 h-72 w-72 rounded-full bg-primary/15 blur-3xl pointer-events-none"
+          aria-hidden
+        />
+        <LatamMap className="absolute right-[2%] top-1/2 -translate-y-1/2 h-[120%] w-auto text-primary/40 pointer-events-none select-none hidden md:block" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-primary/[0.06] pointer-events-none" />
 
         <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight">
@@ -86,7 +90,7 @@ export default async function HomePage({
       </section>
 
       {/* How it works */}
-      <section className="py-20 bg-muted/50">
+      <section className="py-20 bg-primary/[0.04]">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-semibold text-center tracking-tight">
             {dict.home.how_it_works.title}
