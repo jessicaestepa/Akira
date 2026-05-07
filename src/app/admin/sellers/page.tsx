@@ -86,7 +86,7 @@ export default async function AdminSellersPage() {
                     <td className="px-4 py-3">{formatCurrency(s.monthly_revenue)}</td>
                     <td className="px-4 py-3">{formatCurrency(s.asking_price)}</td>
                     <td className="px-4 py-3">
-                      <LeadStatusBadge status={s.status} />
+                      <LeadStatusBadge status={(s.status ?? "new") as SellerLead["status"]} />
                     </td>
                   </tr>
                 ))}

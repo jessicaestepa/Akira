@@ -87,7 +87,7 @@ export default async function AdminBuyersPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap gap-1">
-                        {b.preferred_geographies.map((g) => (
+                        {(Array.isArray(b.preferred_geographies) ? b.preferred_geographies : []).map((g) => (
                           <span
                             key={g}
                             className="inline-block bg-muted px-1.5 py-0.5 rounded text-xs"
@@ -99,7 +99,7 @@ export default async function AdminBuyersPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap gap-1">
-                        {b.preferred_sectors.map((s) => (
+                        {(Array.isArray(b.preferred_sectors) ? b.preferred_sectors : []).map((s) => (
                           <span
                             key={s}
                             className="inline-block bg-muted px-1.5 py-0.5 rounded text-xs"
@@ -110,7 +110,7 @@ export default async function AdminBuyersPage() {
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <LeadStatusBadge status={b.status} />
+                      <LeadStatusBadge status={(b.status ?? "new") as BuyerLead["status"]} />
                     </td>
                   </tr>
                 ))}

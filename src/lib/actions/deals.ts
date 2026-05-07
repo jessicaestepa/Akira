@@ -86,15 +86,20 @@ export async function getPublicDeals(): Promise<Deal[]> {
 }
 
 export async function getAllDeals(): Promise<Deal[]> {
-  const { data, error } = await supabaseAdmin
-    .from("deals")
-    .select("*")
-    .order("created_at", { ascending: false });
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("deals")
+      .select("*")
+      .order("created_at", { ascending: false });
 
-  if (error) {
-    console.error("Fetch all deals error:", error);
+    if (error) {
+      console.error("Fetch all deals error:", error);
+      return [];
+    }
+
+    return data ?? [];
+  } catch (err) {
+    console.error("Fetch all deals exception:", err);
     return [];
   }
-
-  return data ?? [];
 }
