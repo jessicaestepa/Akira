@@ -3,6 +3,7 @@ import { sellerSchema } from "@/lib/schemas/seller";
 import { supabaseAdmin } from "@/lib/supabase/client";
 import { getResend, notificationEmail } from "@/lib/email/resend";
 import { sellerEmailHtml } from "@/lib/email/templates";
+import { scoreDeal } from "@/lib/deal-scoring";
 
 export async function POST(request: Request) {
   let body: unknown;
@@ -26,11 +27,14 @@ export async function POST(request: Request) {
   }
 
   const data = result.data;
+  let insertedSellerId: string | null = null;
 
   try {
-    const { error: dbError } = await supabaseAdmin
+    const { data: insertedSeller, error: dbError } = await supabaseAdmin
       .from("seller_leads")
-      .insert(data);
+      .insert(data)
+      .select("*")
+      .single();
 
     if (dbError) {
       console.error("[api/seller] Supabase insert error:", dbError);
@@ -38,6 +42,39 @@ export async function POST(request: Request) {
         { error: "Failed to submit. Please try again." },
         { status: 500 }
       );
+    }
+
+    if (insertedSeller) {
+      insertedSellerId = insertedSeller.id;
+      const dealScore = scoreDeal(insertedSeller);
+      const nextStage = dealScore.total >= 75 ? "reviewing" : "new";
+
+      const { error: updateError } = await supabaseAdmin
+        .from("seller_leads")
+        .update({
+          deal_score: dealScore.total,
+          score_breakdown: dealScore.breakdown,
+          deal_stage: nextStage,
+          last_scored_at: new Date().toISOString(),
+        })
+        .eq("id", insertedSeller.id);
+
+      if (updateError) {
+        console.error("[api/seller] scoring update error:", updateError);
+      } else {
+        await supabaseAdmin.from("deal_activity_log").insert({
+          seller_id: insertedSeller.id,
+          action: "score_update",
+          details: {
+            total: dealScore.total,
+            breakdown: dealScore.breakdown,
+            flags: dealScore.flags,
+            redFlags: dealScore.redFlags,
+            stage: nextStage,
+            source: "seller_submission",
+          },
+        });
+      }
     }
   } catch (err) {
     console.error("[api/seller] Unexpected DB error:", err);
@@ -61,5 +98,5 @@ export async function POST(request: Request) {
     console.error("[api/seller] Email notification error:", emailErr);
   }
 
-  return NextResponse.json({ success: true }, { status: 201 });
+  return NextResponse.json({ success: true, seller_id: insertedSellerId }, { status: 201 });
 }

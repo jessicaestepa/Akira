@@ -1,10 +1,32 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { SESSION_COOKIE_NAME, verifySessionToken } from "@/lib/auth/session";
+import { supabaseAdmin } from "@/lib/supabase/client";
+import { getPipelinePath } from "@/lib/auth/pipeline-path";
 
-export default function AdminLayout({
+async function getNewDealCount(): Promise<number> {
+  const { count } = await supabaseAdmin
+    .from("seller_leads")
+    .select("*", { count: "exact", head: true })
+    .eq("deal_stage", "new");
+
+  return count ?? 0;
+}
+
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const cookieStore = await cookies();
+  const auth = cookieStore.get(SESSION_COOKIE_NAME);
+  const isAuthed = await verifySessionToken(auth?.value);
+  if (!isAuthed) redirect("/admin");
+
+  const newDeals = await getNewDealCount();
+  const pipelinePath = await getPipelinePath();
+
   return (
     <div className="min-h-screen flex flex-col">
       <nav className="border-b border-border bg-background">
@@ -39,6 +61,17 @@ export default function AdminLayout({
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
                 Deals
+              </Link>
+              <Link
+                href={pipelinePath}
+                className="text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-2"
+              >
+                Pipeline
+                {newDeals > 0 && (
+                  <span className="inline-flex min-w-5 h-5 items-center justify-center rounded-full bg-primary/15 text-primary text-xs px-1.5">
+                    {newDeals}
+                  </span>
+                )}
               </Link>
             </div>
           </div>

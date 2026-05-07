@@ -25,10 +25,20 @@ export interface SellerLead {
   annual_revenue_optional: number | null;
   team_size: number | null;
   asking_price: number | null;
+  revenue_range: string | null;
+  profitability_status: string | null;
+  asking_price_range: string | null;
   reason_for_selling: string | null;
   additional_notes: string | null;
   consent_checkbox: boolean;
   status: LeadStatus;
+  deal_score: number;
+  deal_stage: "new" | "reviewing" | "shortlisted" | "lp_ready" | "passed";
+  thesis_fit_notes: string | null;
+  score_breakdown: DealScoreBreakdown;
+  is_starred: boolean;
+  last_scored_at: string | null;
+  lp_card_generated: boolean;
 }
 
 export interface BuyerLead {
@@ -44,11 +54,41 @@ export interface BuyerLead {
   preferred_sectors: string[];
   min_check_size: number | null;
   max_check_size: number | null;
+  check_size_range: string | null;
   target_revenue_range: string | null;
   acquisition_interest: string | null;
   additional_notes: string | null;
   consent_checkbox: boolean;
   status: LeadStatus;
+  match_scores: BuyerMatchScore[];
+}
+
+export interface DealScoreBreakdown {
+  businessType: number;
+  recurringRevenue: number;
+  marginProfile: number;
+  valuationMultiple: number;
+  aiOpportunity: number;
+  marketSize: number;
+}
+
+export interface BuyerMatchScore {
+  seller_id: string;
+  score: number;
+  reasons: string[];
+}
+
+export interface DealActivityLog {
+  id: string;
+  seller_id: string;
+  action:
+    | "stage_change"
+    | "score_update"
+    | "note_added"
+    | "lp_card_generated"
+    | "starred";
+  details: Record<string, unknown>;
+  created_at: string;
 }
 
 export interface Deal {

@@ -1,12 +1,13 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { AdminLoginForm } from "./login-form";
+import { SESSION_COOKIE_NAME, verifySessionToken } from "@/lib/auth/session";
 
 export default async function AdminPage() {
   const cookieStore = await cookies();
-  const auth = cookieStore.get("aqüira_admin_auth");
+  const auth = cookieStore.get(SESSION_COOKIE_NAME);
 
-  if (auth?.value === "authenticated") {
+  if (await verifySessionToken(auth?.value)) {
     redirect("/admin/sellers");
   }
 
