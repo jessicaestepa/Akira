@@ -1,14 +1,15 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { AdminLoginForm } from "./login-form";
-import { SESSION_COOKIE_NAME, verifySessionToken } from "@/lib/auth/session";
+import { readAdminSessionCookieValue } from "@/lib/auth/admin-session-cookie";
+import { verifySessionToken } from "@/lib/auth/session";
 import { getPipelinePath } from "@/lib/auth/pipeline-path";
 
 export default async function AdminPage() {
   const cookieStore = await cookies();
-  const auth = cookieStore.get(SESSION_COOKIE_NAME);
+  const auth = readAdminSessionCookieValue(cookieStore);
 
-  if (await verifySessionToken(auth?.value)) {
+  if (await verifySessionToken(auth)) {
     const pipelinePath = await getPipelinePath();
     redirect(pipelinePath);
   }

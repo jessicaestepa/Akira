@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { locales, defaultLocale } from "@/lib/i18n/config";
-
-const SESSION_COOKIE = "aqüira_admin_auth";
+import { readAdminSessionCookieValue } from "@/lib/auth/admin-session-cookie";
 const SIGNING_PREFIX = "aqüira_session_v1:";
 
 async function expectedToken(): Promise<string | null> {
@@ -42,7 +41,7 @@ export async function middleware(request: NextRequest) {
 
   // --- Admin routes ---
   if (pathname.startsWith("/admin")) {
-    const token = request.cookies.get(SESSION_COOKIE)?.value;
+    const token = readAdminSessionCookieValue(request.cookies);
     const expected = await expectedToken();
 
     const isAuthenticated =

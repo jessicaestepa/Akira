@@ -1,6 +1,8 @@
 import "server-only";
 
-const COOKIE_NAME = "aquira_admin_auth";
+import { ADMIN_SESSION_COOKIE_NAMES } from "./admin-session-cookie";
+
+const COOKIE_NAME = ADMIN_SESSION_COOKIE_NAMES[0];
 const SIGNING_PREFIX = "aqüira_session_v1:";
 
 async function hmacSign(secret: string, payload: string): Promise<string> {

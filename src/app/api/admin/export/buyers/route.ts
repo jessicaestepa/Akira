@@ -1,7 +1,8 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/client";
-import { verifySessionToken, SESSION_COOKIE_NAME } from "@/lib/auth/session";
+import { readAdminSessionCookieValue } from "@/lib/auth/admin-session-cookie";
+import { verifySessionToken } from "@/lib/auth/session";
 import { toCsv } from "@/lib/csv";
 
 const HEADERS = [
@@ -13,7 +14,7 @@ const HEADERS = [
 
 export async function GET() {
   const cookieStore = await cookies();
-  const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+  const token = readAdminSessionCookieValue(cookieStore);
 
   if (!(await verifySessionToken(token))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { supabaseAdmin } from "@/lib/supabase/client";
-import { SESSION_COOKIE_NAME, verifySessionToken } from "@/lib/auth/session";
+import { readAdminSessionCookieValue } from "@/lib/auth/admin-session-cookie";
+import { verifySessionToken } from "@/lib/auth/session";
 
 const STAGE_VALUES = new Set(["new", "reviewing", "shortlisted", "lp_ready", "passed"]);
 
@@ -10,8 +11,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const cookieStore = await cookies();
-  const auth = cookieStore.get(SESSION_COOKIE_NAME);
-  if (!(await verifySessionToken(auth?.value))) {
+  const auth = readAdminSessionCookieValue(cookieStore);
+  if (!(await verifySessionToken(auth))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
