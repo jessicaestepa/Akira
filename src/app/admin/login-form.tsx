@@ -28,7 +28,7 @@ export function AdminLoginForm() {
     });
 
     if (res.ok) {
-      router.push("/admin/sellers");
+      router.push("/admin");
       router.refresh();
     } else {
       setError("Invalid credentials");
