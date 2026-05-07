@@ -17,21 +17,27 @@ export function AdminLoginForm() {
     setError(null);
 
     const formData = new FormData(e.currentTarget);
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        body: JSON.stringify({
+          username: formData.get("username"),
+          password: formData.get("password"),
+        }),
+        headers: { "Content-Type": "application/json" },
+      });
 
-    const res = await fetch("/api/admin/login", {
-      method: "POST",
-      body: JSON.stringify({
-        username: formData.get("username"),
-        password: formData.get("password"),
-      }),
-      headers: { "Content-Type": "application/json" },
-    });
+      if (res.ok) {
+        router.push("/admin");
+        router.refresh();
+        return;
+      }
 
-    if (res.ok) {
-      router.push("/admin");
-      router.refresh();
-    } else {
-      setError("Invalid credentials");
+      const payload = (await res.json().catch(() => ({}))) as { error?: string };
+      setError(payload.error || "Invalid credentials");
+    } catch {
+      setError("Network error while logging in");
+    } finally {
       setLoading(false);
     }
   }
