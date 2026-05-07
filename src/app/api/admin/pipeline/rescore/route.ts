@@ -1,9 +1,17 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { scoreAllDeals } from "@/lib/deal-scoring";
 import { supabaseAdmin } from "@/lib/supabase/client";
 import { matchBuyerToSellers } from "@/lib/match-scoring";
+import { SESSION_COOKIE_NAME, verifySessionToken } from "@/lib/auth/session";
 
 export async function POST() {
+  const cookieStore = await cookies();
+  const auth = cookieStore.get(SESSION_COOKIE_NAME);
+  if (!(await verifySessionToken(auth?.value))) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   await scoreAllDeals();
 
   const { data: sellers } = await supabaseAdmin.from("seller_leads").select("*");

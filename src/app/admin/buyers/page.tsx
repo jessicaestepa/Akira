@@ -1,6 +1,7 @@
 import { supabaseAdmin } from "@/lib/supabase/client";
 import { LeadStatusBadge } from "@/components/admin/status-badge";
 import type { BuyerLead } from "@/lib/supabase/types";
+import { requireAdminSession } from "@/lib/auth/admin-guard";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +28,7 @@ function formatCurrency(value: number | null) {
 }
 
 export default async function AdminBuyersPage() {
+  await requireAdminSession();
   const buyers = await getBuyers();
 
   return (

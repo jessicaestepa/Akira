@@ -1,5 +1,6 @@
 import { getAllDeals } from "@/lib/actions/deals";
 import { DealStatusBadge } from "@/components/admin/status-badge";
+import { requireAdminSession } from "@/lib/auth/admin-guard";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +14,7 @@ function formatCurrency(value: number | null) {
 }
 
 export default async function AdminDealsPage() {
+  await requireAdminSession();
   const deals = await getAllDeals();
 
   return (

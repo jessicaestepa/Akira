@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { SESSION_COOKIE_NAME, verifySessionToken } from "@/lib/auth/session";
 import { supabaseAdmin } from "@/lib/supabase/client";
 import { getPipelinePath } from "@/lib/auth/pipeline-path";
@@ -22,7 +21,15 @@ export default async function AdminLayout({
   const cookieStore = await cookies();
   const auth = cookieStore.get(SESSION_COOKIE_NAME);
   const isAuthed = await verifySessionToken(auth?.value);
-  if (!isAuthed) redirect("/admin");
+  if (!isAuthed) {
+    return (
+      <div className="min-h-screen">
+        <main className="py-8">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">{children}</div>
+        </main>
+      </div>
+    );
+  }
 
   const newDeals = await getNewDealCount();
   const pipelinePath = await getPipelinePath();
