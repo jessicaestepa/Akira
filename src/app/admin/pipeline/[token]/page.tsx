@@ -1,5 +1,5 @@
-import { notFound } from "next/navigation";
-import { getPipelineToken } from "@/lib/auth/pipeline-path";
+import { redirect } from "next/navigation";
+import { getPipelinePath, getPipelineToken } from "@/lib/auth/pipeline-path";
 import { PipelineContent } from "../pipeline-content";
 import { requireAdminSession } from "@/lib/auth/admin-guard";
 
@@ -13,7 +13,10 @@ export default async function SecurePipelinePage({
   await requireAdminSession();
   const { token } = await params;
   const expected = await getPipelineToken();
-  if (token !== expected) notFound();
+  if (token !== expected) {
+    const canonicalPath = await getPipelinePath();
+    redirect(canonicalPath);
+  }
 
   return <PipelineContent />;
 }

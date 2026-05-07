@@ -17,11 +17,11 @@ function parseRangeAsking(value: string | null): number {
 }
 
 export async function PipelineContent() {
-  const { data: sellersData } = await supabaseAdmin
+  const { data: sellersData, error: sellersError } = await supabaseAdmin
     .from("seller_leads")
     .select("*")
     .order("deal_score", { ascending: false });
-  const { data: activityData } = await supabaseAdmin
+  const { data: activityData, error: activityError } = await supabaseAdmin
     .from("deal_activity_log")
     .select("*")
     .order("created_at", { ascending: false });
@@ -83,6 +83,11 @@ export async function PipelineContent() {
 
   return (
     <div>
+      {(sellersError || activityError) && (
+        <div className="mb-4 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          Pipeline loaded with partial data. Please run the latest Supabase migration for deal intelligence fields.
+        </div>
+      )}
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">Deal Intelligence Pipeline</h1>
       </div>
