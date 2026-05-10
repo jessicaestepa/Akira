@@ -1,5 +1,12 @@
-import type { DealScore } from "@/lib/deal-scoring";
-import type { SellerLead } from "@/lib/supabase/types";
+import type { DealScoreBreakdown, SellerLead } from "@/lib/supabase/types";
+import { estimateAnnualRevenue, estimateAskingPrice, estimateMonthlyRevenue } from "@/lib/seller-financials";
+
+export type DealScoreForCard = {
+  total: number;
+  breakdown: DealScoreBreakdown;
+  flags: string[];
+  redFlags: string[];
+};
 
 export interface LpDealCardData {
   dealId: string;
@@ -12,30 +19,10 @@ export interface LpDealCardData {
   impliedMultiple: number | null;
   stage: string;
   thesisScore: number;
-  breakdown: DealScore["breakdown"];
+  breakdown: DealScoreBreakdown;
   thesisAlignment: string[];
   aiLatamOpportunity: string;
   confidentialityNotice: string;
-}
-
-function estimateRevenueFromRange(range: string | null | undefined): number | null {
-  const key = (range ?? "").toLowerCase();
-  if (key === "50k_plus") return 50000;
-  if (key === "20k_50k") return 20000;
-  if (key === "5k_20k") return 5000;
-  if (key === "under_5k") return 1000;
-  if (key === "pre_revenue") return 0;
-  return null;
-}
-
-function estimateAskingFromRange(range: string | null | undefined): number | null {
-  const key = (range ?? "").toLowerCase();
-  if (key === "1m_plus") return 1000000;
-  if (key === "500k_1m") return 500000;
-  if (key === "250k_500k") return 250000;
-  if (key === "100k_250k") return 100000;
-  if (key === "under_100k") return 50000;
-  return null;
 }
 
 function formatDealId(createdAt: string, sellerId: string): string {
@@ -46,19 +33,13 @@ function formatDealId(createdAt: string, sellerId: string): string {
 
 export function buildLpDealCardData(
   seller: Partial<SellerLead> & { id: string; created_at: string },
-  score: DealScore
+  score: DealScoreForCard
 ): LpDealCardData {
-  const monthlyRevenue =
-    seller.monthly_revenue && seller.monthly_revenue > 0
-      ? Number(seller.monthly_revenue)
-      : estimateRevenueFromRange(seller.revenue_range);
+  const monthlyRevenue = estimateMonthlyRevenue(seller);
   const monthlyProfit =
     seller.monthly_profit && seller.monthly_profit > 0 ? Number(seller.monthly_profit) : null;
-  const askingPrice =
-    seller.asking_price && seller.asking_price > 0
-      ? Number(seller.asking_price)
-      : estimateAskingFromRange(seller.asking_price_range);
-  const annualRevenue = monthlyRevenue ? monthlyRevenue * 12 : null;
+  const askingPrice = estimateAskingPrice(seller);
+  const annualRevenue = estimateAnnualRevenue(seller);
   const impliedMultiple =
     askingPrice && annualRevenue && annualRevenue > 0 ? askingPrice / annualRevenue : null;
   const profitMargin =

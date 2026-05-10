@@ -2,18 +2,10 @@ import { supabaseAdmin } from "@/lib/supabase/client";
 import type { DealActivityLog, SellerLead } from "@/lib/supabase/types";
 import { PipelineTable } from "@/components/admin/pipeline-table";
 import { PipelineStats } from "@/components/admin/pipeline-stats";
+import { estimateAnnualRevenue, estimateAskingPrice } from "@/lib/seller-financials";
 
 function toNumber(value: number | null | undefined): number {
   return typeof value === "number" ? value : 0;
-}
-
-function parseRangeAsking(value: string | null): number {
-  if (value === "under_100k") return 50000;
-  if (value === "100k_250k") return 175000;
-  if (value === "250k_500k") return 375000;
-  if (value === "500k_1m") return 750000;
-  if (value === "1m_plus") return 1200000;
-  return 0;
 }
 
 export async function PipelineContent() {
@@ -50,14 +42,8 @@ export async function PipelineContent() {
     .slice(0, 3)
     .map(([sector, count]) => ({ sector, count }));
 
-  const askingValues = sellers.map(
-    (s) => toNumber(s.asking_price) || parseRangeAsking(s.asking_price_range)
-  );
-  const revenueValues = sellers.map(
-    (s) =>
-      toNumber(s.annual_revenue_optional) ||
-      (toNumber(s.monthly_revenue) > 0 ? toNumber(s.monthly_revenue) * 12 : 0)
-  );
+  const askingValues = sellers.map((s) => estimateAskingPrice(s) ?? 0);
+  const revenueValues = sellers.map((s) => estimateAnnualRevenue(s) ?? 0);
   const averageAsking =
     askingValues.length > 0
       ? askingValues.reduce((sum, value) => sum + value, 0) / askingValues.length
@@ -76,10 +62,7 @@ export async function PipelineContent() {
       : 0;
   const pipelineValue = sellers
     .filter((s) => s.deal_stage === "shortlisted")
-    .reduce(
-      (sum, s) => sum + (toNumber(s.asking_price) || parseRangeAsking(s.asking_price_range)),
-      0
-    );
+    .reduce((sum, s) => sum + (estimateAskingPrice(s) ?? 0), 0);
 
   return (
     <div>

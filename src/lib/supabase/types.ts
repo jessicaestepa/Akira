@@ -9,6 +9,12 @@ export type LeadStatus =
 
 export type DealStatus = "draft" | "live" | "archived";
 
+/** Stored on seller_leads.score_breakdown (dimensions + thesis strings). */
+export type SellerScoreBreakdownStored = DealScoreBreakdown & {
+  flags?: string[];
+  redFlags?: string[];
+};
+
 export interface SellerLead {
   id: string;
   created_at: string;
@@ -35,7 +41,7 @@ export interface SellerLead {
   deal_score: number;
   deal_stage: "new" | "reviewing" | "shortlisted" | "lp_ready" | "passed";
   thesis_fit_notes: string | null;
-  score_breakdown: DealScoreBreakdown;
+  score_breakdown: SellerScoreBreakdownStored;
   is_starred: boolean;
   last_scored_at: string | null;
   lp_card_generated: boolean;

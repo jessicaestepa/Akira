@@ -3,7 +3,12 @@
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import type { DealActivityLog, SellerLead } from "@/lib/supabase/types";
+import type { DealActivityLog, SellerLead, SellerScoreBreakdownStored } from "@/lib/supabase/types";
+import {
+  estimateAnnualRevenue,
+  estimateAskingPrice,
+  estimateMonthlyRevenue,
+} from "@/lib/seller-financials";
 import { PipelineFilters } from "./pipeline-filters";
 import { DealDetailPanel } from "./deal-detail-panel";
 
@@ -12,8 +17,8 @@ interface Props {
   activityBySeller: Record<string, DealActivityLog[]>;
 }
 
-function formatCurrency(value: number | null): string {
-  if (!value) return "—";
+function formatCurrency(value: number | null | undefined): string {
+  if (value == null || Number.isNaN(value)) return "—";
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
@@ -28,34 +33,32 @@ function scoreColor(score: number): string {
 }
 
 function calcMultiple(s: SellerLead): number | null {
-  const asking =
-    s.asking_price ??
-    (s.asking_price_range === "1m_plus"
-      ? 1000000
-      : s.asking_price_range === "500k_1m"
-      ? 500000
-      : s.asking_price_range === "250k_500k"
-      ? 250000
-      : s.asking_price_range === "100k_250k"
-      ? 100000
-      : s.asking_price_range === "under_100k"
-      ? 50000
-      : null);
-  const annualRev =
-    s.annual_revenue_optional ??
-    (s.monthly_revenue ? s.monthly_revenue * 12 : null) ??
-    (s.revenue_range === "50k_plus"
-      ? 600000
-      : s.revenue_range === "20k_50k"
-      ? 240000
-      : s.revenue_range === "5k_20k"
-      ? 60000
-      : s.revenue_range === "under_5k"
-      ? 12000
-      : null);
-
+  const asking = estimateAskingPrice(s);
+  const annualRev = estimateAnnualRevenue(s);
   if (!asking || !annualRev || annualRev <= 0) return null;
   return asking / annualRev;
+}
+
+function displayMonthlyRevenue(s: SellerLead): number | null {
+  const direct = s.monthly_revenue != null && s.monthly_revenue > 0 ? s.monthly_revenue : null;
+  if (direct != null) return direct;
+  return estimateMonthlyRevenue(s);
+}
+
+function displayAsking(s: SellerLead): number | null {
+  const direct = s.asking_price != null && s.asking_price > 0 ? s.asking_price : null;
+  if (direct != null) return direct;
+  return estimateAskingPrice(s);
+}
+
+function storedFlags(breakdown: SellerScoreBreakdownStored | null | undefined): {
+  flags: string[];
+  redFlags: string[];
+} {
+  if (!breakdown) return { flags: [], redFlags: [] };
+  const flags = Array.isArray(breakdown.flags) ? breakdown.flags : [];
+  const redFlags = Array.isArray(breakdown.redFlags) ? breakdown.redFlags : [];
+  return { flags, redFlags };
 }
 
 export function PipelineTable({ sellers, activityBySeller }: Props) {
@@ -91,8 +94,10 @@ export function PipelineTable({ sellers, activityBySeller }: Props) {
       })
       .sort((a, b) => {
         if (sortBy === "score") return b.deal_score - a.deal_score;
-        if (sortBy === "asking") return (b.asking_price ?? 0) - (a.asking_price ?? 0);
-        if (sortBy === "revenue") return (b.monthly_revenue ?? 0) - (a.monthly_revenue ?? 0);
+        if (sortBy === "asking")
+          return (displayAsking(b) ?? 0) - (displayAsking(a) ?? 0);
+        if (sortBy === "revenue")
+          return (displayMonthlyRevenue(b) ?? 0) - (displayMonthlyRevenue(a) ?? 0);
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       });
   }, [rows, stage, businessType, starredOnly, minScore, search, sortBy]);
@@ -168,15 +173,18 @@ export function PipelineTable({ sellers, activityBySeller }: Props) {
             {filtered.map((s) => {
               const multiple = calcMultiple(s);
               const breakdown = s.score_breakdown ?? {};
-              const goodFlags = [
+              const { flags: thesisFlags, redFlags: thesisRed } = storedFlags(breakdown);
+              const fallbackGood = [
                 breakdown.businessType >= 20 ? "SaaS fit" : null,
                 breakdown.marginProfile >= 10 ? "High margin" : null,
                 breakdown.valuationMultiple >= 10 ? "Attractive multiple" : null,
               ].filter(Boolean) as string[];
-              const redFlags = [
+              const fallbackRed = [
                 breakdown.recurringRevenue <= 5 ? "Low recurring" : null,
                 breakdown.marginProfile === 0 ? "No profitability" : null,
               ].filter(Boolean) as string[];
+              const goodFlags = thesisFlags.length > 0 ? thesisFlags : fallbackGood;
+              const redFlags = thesisRed.length > 0 ? thesisRed : fallbackRed;
               return (
                 <tr key={s.id} className="border-b last:border-0 hover:bg-muted/25">
                   <td className="px-3 py-2">
@@ -196,8 +204,8 @@ export function PipelineTable({ sellers, activityBySeller }: Props) {
                     <p className="text-xs text-muted-foreground">{s.country}</p>
                   </td>
                   <td className="px-3 py-2">{s.business_type}</td>
-                  <td className="px-3 py-2">{formatCurrency(s.monthly_revenue)}</td>
-                  <td className="px-3 py-2">{formatCurrency(s.asking_price)}</td>
+                  <td className="px-3 py-2">{formatCurrency(displayMonthlyRevenue(s))}</td>
+                  <td className="px-3 py-2">{formatCurrency(displayAsking(s))}</td>
                   <td className="px-3 py-2">{multiple ? `${multiple.toFixed(1)}x` : "—"}</td>
                   <td className="px-3 py-2">
                     <select

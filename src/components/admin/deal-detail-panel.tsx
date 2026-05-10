@@ -3,8 +3,8 @@
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import type { DealScore } from "@/lib/deal-scoring";
-import type { SellerLead, DealActivityLog } from "@/lib/supabase/types";
+import type { SellerLead, DealActivityLog, DealScoreBreakdown } from "@/lib/supabase/types";
+import type { DealScoreForCard } from "@/lib/lp-card-generator";
 import { ScoreBreakdown } from "./score-breakdown";
 import { LpDealCard } from "./lp-deal-card";
 import { buildLpDealCardData } from "@/lib/lp-card-generator";
@@ -17,6 +17,15 @@ interface Props {
   onGenerateCard: (sellerId: string) => Promise<void>;
 }
 
+const EMPTY_BREAKDOWN: DealScoreBreakdown = {
+  businessType: 0,
+  recurringRevenue: 0,
+  marginProfile: 0,
+  valuationMultiple: 0,
+  aiOpportunity: 0,
+  marketSize: 0,
+};
+
 export function DealDetailPanel({
   seller,
   activities,
@@ -28,23 +37,30 @@ export function DealDetailPanel({
   const [saving, setSaving] = useState(false);
   const [showCard, setShowCard] = useState(false);
 
-  const score = useMemo<DealScore>(
-    () => ({
-      total: seller?.deal_score ?? 0,
-      breakdown:
-        seller?.score_breakdown ?? {
-          businessType: 0,
-          recurringRevenue: 0,
-          marginProfile: 0,
-          valuationMultiple: 0,
-          aiOpportunity: 0,
-          marketSize: 0,
-        },
-      flags: [],
-      redFlags: [],
-    }),
-    [seller]
-  );
+  const score = useMemo<DealScoreForCard>(() => {
+    const raw = seller?.score_breakdown;
+    if (!raw) {
+      return {
+        total: seller?.deal_score ?? 0,
+        breakdown: EMPTY_BREAKDOWN,
+        flags: [],
+        redFlags: [],
+      };
+    }
+    return {
+      total: seller.deal_score ?? 0,
+      breakdown: {
+        businessType: raw.businessType ?? 0,
+        recurringRevenue: raw.recurringRevenue ?? 0,
+        marginProfile: raw.marginProfile ?? 0,
+        valuationMultiple: raw.valuationMultiple ?? 0,
+        aiOpportunity: raw.aiOpportunity ?? 0,
+        marketSize: raw.marketSize ?? 0,
+      },
+      flags: Array.isArray(raw.flags) ? raw.flags : [],
+      redFlags: Array.isArray(raw.redFlags) ? raw.redFlags : [],
+    };
+  }, [seller]);
 
   if (!seller) return null;
 
@@ -62,6 +78,24 @@ export function DealDetailPanel({
           {seller.business_type} • {seller.country} • score {seller.deal_score}/100
         </div>
         <ScoreBreakdown breakdown={score.breakdown} />
+
+        {(score.flags.length > 0 || score.redFlags.length > 0) && (
+          <div className="space-y-2">
+            <p className="text-sm font-medium">Thesis flags</p>
+            <div className="flex flex-wrap gap-1">
+              {score.flags.map((f) => (
+                <Badge key={f} variant="secondary">
+                  {f}
+                </Badge>
+              ))}
+              {score.redFlags.map((f) => (
+                <Badge key={f} variant="destructive">
+                  {f}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="space-y-2">
           <p className="text-sm font-medium">Thesis Notes</p>

@@ -1,7 +1,14 @@
 import "server-only";
 
 import { supabaseAdmin } from "@/lib/supabase/client";
-import type { DealScoreBreakdown, SellerLead } from "@/lib/supabase/types";
+import type { DealScoreBreakdown, SellerLead, SellerScoreBreakdownStored } from "@/lib/supabase/types";
+import {
+  estimateAnnualProfit,
+  estimateAnnualRevenue,
+  estimateAskingPrice,
+  estimateMonthlyRevenue,
+  normalizeSlug,
+} from "@/lib/seller-financials";
 
 export interface DealScore {
   total: number;
@@ -38,41 +45,53 @@ const BUSINESS_TYPE_SCORES: Record<string, number> = {
 };
 
 function normalize(value: string | null | undefined): string {
-  return (value ?? "").trim().toLowerCase();
+  return String(value ?? "")
+    .trim()
+    .toLowerCase();
 }
 
-function monthlyRevenueEstimate(seller: SellerRecord): number | null {
-  if (seller.monthly_revenue && seller.monthly_revenue > 0) return Number(seller.monthly_revenue);
-  const range = normalize(seller.revenue_range);
-  if (range === "50k_plus") return 50000;
-  if (range === "20k_50k") return 20000;
-  if (range === "5k_20k") return 5000;
-  if (range === "under_5k") return 1000;
-  if (range === "pre_revenue") return 0;
-  return null;
+/** Map free-text or legacy labels to scoring bucket keys. */
+export function canonicalBusinessType(raw: string | null | undefined): string {
+  const n = normalize(raw);
+  const direct: (keyof typeof BUSINESS_TYPE_SCORES)[] = [
+    "saas",
+    "ecommerce",
+    "agency",
+    "marketplace",
+    "fintech",
+    "healthtech",
+    "edtech",
+    "other",
+  ];
+  if (direct.includes(n as keyof typeof BUSINESS_TYPE_SCORES)) return n;
+  if (n.includes("marketplace")) return "marketplace";
+  if (n.includes("fintech")) return "fintech";
+  if (n.includes("health")) return "healthtech";
+  if (n.includes("edtech") || n.includes("education")) return "edtech";
+  if (n.includes("saas") || n.includes("software")) return "saas";
+  if (n.includes("ecommerce") || n.includes("e-commerce") || n.includes("commerce")) return "ecommerce";
+  if (n.includes("agency")) return "agency";
+  return "other";
 }
 
-function askingPriceEstimate(seller: SellerRecord): number | null {
-  if (seller.asking_price && seller.asking_price > 0) return Number(seller.asking_price);
-  const range = normalize(seller.asking_price_range);
-  if (range === "1m_plus") return 1000000;
-  if (range === "500k_1m") return 500000;
-  if (range === "250k_500k") return 250000;
-  if (range === "100k_250k") return 100000;
-  if (range === "under_100k") return 50000;
-  return null;
+function canonicalProfitability(raw: string | null | undefined): string {
+  const n = normalizeSlug(raw);
+  if (n === "profitable") return "profitable";
+  if (n === "break_even" || n === "breakeven") return "break_even";
+  if (n === "not_profitable" || (n.includes("not") && n.includes("profit"))) return "not_profitable";
+  return n;
 }
 
 function businessTypeScore(seller: SellerRecord, flags: string[]): number {
-  const businessType = normalize(seller.business_type);
+  const businessType = canonicalBusinessType(seller.business_type);
   const base = BUSINESS_TYPE_SCORES[businessType] ?? 3;
   if (base >= 20) flags.push("Software aligned");
   if (businessType === "saas") flags.push("SaaS");
   return base;
 }
 
-function recurringRevenueScore(seller: SellerRecord, flags: string[], redFlags: string[]): number {
-  const businessType = normalize(seller.business_type);
+function recurringRevenueScore(seller: SellerRecord, _flags: string[], redFlags: string[]): number {
+  const businessType = canonicalBusinessType(seller.business_type);
   const recurringFriendly = ["saas", "fintech", "healthtech", "edtech", "marketplace"];
   const maybeRecurring = ["agency", "ecommerce"];
   if (recurringFriendly.includes(businessType)) return 15;
@@ -85,7 +104,7 @@ function recurringRevenueScore(seller: SellerRecord, flags: string[], redFlags: 
 }
 
 function marginProfileScore(seller: SellerRecord, flags: string[], redFlags: string[]): number {
-  const profitability = normalize(seller.profitability_status);
+  const profitability = canonicalProfitability(seller.profitability_status);
   if (profitability === "profitable") {
     flags.push("Profitable");
     return 12;
@@ -103,16 +122,19 @@ function valuationMultipleScore(
   flags: string[],
   redFlags: string[]
 ): number {
-  const asking = askingPriceEstimate(seller);
-  const annualRevenue =
-    (seller.annual_revenue_optional && seller.annual_revenue_optional > 0
-      ? Number(seller.annual_revenue_optional)
-      : null) ?? ((monthlyRevenueEstimate(seller) ?? 0) * 12 || null);
-  const annualProfit = (seller.monthly_profit ?? 0) > 0 ? Number(seller.monthly_profit) * 12 : null;
+  const asking = estimateAskingPrice(seller);
+  const annualRevenue = estimateAnnualRevenue(seller);
+  const annualProfit = estimateAnnualProfit(seller);
 
   if (!asking) return 5;
 
-  const base = annualRevenue || annualProfit;
+  const base =
+    annualRevenue && annualRevenue > 0
+      ? annualRevenue
+      : annualProfit && annualProfit > 0
+        ? annualProfit
+        : null;
+
   if (!base || base <= 0) return 5;
 
   const multiple = asking / base;
@@ -127,7 +149,8 @@ function valuationMultipleScore(
   }
   if (multiple < 4) return 10;
   if (multiple < 5) return 6;
-  redFlags.push("High valuation multiple");
+  redFlags.push(`High multiple (${multiple.toFixed(1)}x)`);
+  redFlags.push("Above thesis range");
   return 3;
 }
 
@@ -135,7 +158,7 @@ function aiOpportunityScore(seller: SellerRecord, flags: string[]): number {
   const text = `${normalize(seller.additional_notes)} ${normalize(seller.reason_for_selling)} ${normalize(
     seller.industry
   )}`.toLowerCase();
-  const businessType = normalize(seller.business_type);
+  const businessType = canonicalBusinessType(seller.business_type);
 
   let score = 0;
   if (/(content|editorial|media|blog|newsletter|seo|copy)/.test(text)) score += 5;
@@ -148,12 +171,23 @@ function aiOpportunityScore(seller: SellerRecord, flags: string[]): number {
 }
 
 function marketSizeScore(seller: SellerRecord): number {
-  const monthlyRevenue = monthlyRevenueEstimate(seller);
+  const monthlyRevenue = estimateMonthlyRevenue(seller);
   if (monthlyRevenue === null) return 4;
   if (monthlyRevenue > 50000) return 10;
   if (monthlyRevenue >= 10000) return 7;
   if (monthlyRevenue >= 1000) return 4;
   return 2;
+}
+
+function sumBreakdown(breakdown: DealScoreBreakdown): number {
+  return (
+    breakdown.businessType +
+    breakdown.recurringRevenue +
+    breakdown.marginProfile +
+    breakdown.valuationMultiple +
+    breakdown.aiOpportunity +
+    breakdown.marketSize
+  );
 }
 
 export function scoreDeal(seller: SellerRecord): DealScore {
@@ -169,12 +203,18 @@ export function scoreDeal(seller: SellerRecord): DealScore {
     marketSize: marketSizeScore(seller),
   };
 
-  const total = Math.max(
-    0,
-    Math.min(100, Object.values(breakdown).reduce((sum, value) => sum + value, 0))
-  );
+  const total = Math.max(0, Math.min(100, sumBreakdown(breakdown)));
 
   return { total, breakdown, flags, redFlags };
+}
+
+/** Payload stored in `score_breakdown` JSONB (dimensions + flag strings). */
+export function scoreBreakdownForStorage(result: DealScore): SellerScoreBreakdownStored {
+  return {
+    ...result.breakdown,
+    flags: result.flags,
+    redFlags: result.redFlags,
+  };
 }
 
 export async function scoreAllDeals(): Promise<{ updated: number }> {
@@ -185,12 +225,13 @@ export async function scoreAllDeals(): Promise<{ updated: number }> {
   for (const seller of sellers) {
     const result = scoreDeal(seller as SellerRecord);
     const nextStage = result.total >= 75 ? "reviewing" : ((seller.deal_stage as string) || "new");
+    const storedBreakdown = scoreBreakdownForStorage(result);
 
     await supabaseAdmin
       .from("seller_leads")
       .update({
         deal_score: result.total,
-        score_breakdown: result.breakdown,
+        score_breakdown: storedBreakdown,
         last_scored_at: new Date().toISOString(),
         deal_stage: nextStage,
       })
@@ -202,6 +243,8 @@ export async function scoreAllDeals(): Promise<{ updated: number }> {
       details: {
         total: result.total,
         breakdown: result.breakdown,
+        flags: result.flags,
+        redFlags: result.redFlags,
         stage: nextStage,
       },
     });

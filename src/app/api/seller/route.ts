@@ -3,7 +3,7 @@ import { sellerSchema } from "@/lib/schemas/seller";
 import { supabaseAdmin } from "@/lib/supabase/client";
 import { getResend, notificationEmail } from "@/lib/email/resend";
 import { sellerEmailHtml } from "@/lib/email/templates";
-import { scoreDeal } from "@/lib/deal-scoring";
+import { scoreBreakdownForStorage, scoreDeal } from "@/lib/deal-scoring";
 
 export async function POST(request: Request) {
   let body: unknown;
@@ -53,7 +53,7 @@ export async function POST(request: Request) {
         .from("seller_leads")
         .update({
           deal_score: dealScore.total,
-          score_breakdown: dealScore.breakdown,
+          score_breakdown: scoreBreakdownForStorage(dealScore),
           deal_stage: nextStage,
           last_scored_at: new Date().toISOString(),
         })

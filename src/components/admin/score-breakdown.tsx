@@ -1,6 +1,15 @@
 import type { DealScoreBreakdown } from "@/lib/supabase/types";
 
-const MAX: Record<keyof DealScoreBreakdown, number> = {
+const DIMENSION_KEYS = [
+  "businessType",
+  "recurringRevenue",
+  "marginProfile",
+  "valuationMultiple",
+  "aiOpportunity",
+  "marketSize",
+] as const satisfies readonly (keyof DealScoreBreakdown)[];
+
+const MAX: Record<(typeof DIMENSION_KEYS)[number], number> = {
   businessType: 25,
   recurringRevenue: 20,
   marginProfile: 15,
@@ -9,7 +18,7 @@ const MAX: Record<keyof DealScoreBreakdown, number> = {
   marketSize: 10,
 };
 
-const LABELS: Record<keyof DealScoreBreakdown, string> = {
+const LABELS: Record<(typeof DIMENSION_KEYS)[number], string> = {
   businessType: "Business Type",
   recurringRevenue: "Recurring Revenue",
   marginProfile: "Margin Profile",
@@ -25,7 +34,7 @@ interface Props {
 export function ScoreBreakdown({ breakdown }: Props) {
   return (
     <div className="space-y-3">
-      {(Object.keys(breakdown) as Array<keyof DealScoreBreakdown>).map((key) => {
+      {DIMENSION_KEYS.map((key) => {
         const value = breakdown[key] ?? 0;
         const max = MAX[key];
         const width = Math.round((value / max) * 100);
