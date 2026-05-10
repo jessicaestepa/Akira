@@ -15,7 +15,7 @@ interface PipelineFiltersProps {
 
 export function PipelineFilters(props: PipelineFiltersProps) {
   return (
-    <div className="mb-4 grid gap-3 md:grid-cols-2 xl:grid-cols-6">
+    <div className="mb-4 grid gap-3 md:grid-cols-2 xl:grid-cols-6 xl:items-end">
       <input
         className="h-9 rounded-md border border-input bg-background px-3 text-sm"
         placeholder="Search company or notes"
@@ -40,17 +40,24 @@ export function PipelineFilters(props: PipelineFiltersProps) {
         value={props.businessType}
         onChange={(e) => props.setBusinessType(e.target.value)}
       />
-      <label className="flex items-center gap-2 text-sm text-muted-foreground">
-        Min score
-        <input
-          type="range"
-          min={0}
-          max={100}
-          value={props.minScore}
-          onChange={(e) => props.setMinScore(Number(e.target.value))}
-        />
-        <span className="font-medium text-foreground">{props.minScore}</span>
-      </label>
+      <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center xl:col-span-2">
+        <span className="shrink-0 text-sm text-muted-foreground whitespace-nowrap">
+          Min score
+        </span>
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={props.minScore}
+            onChange={(e) => props.setMinScore(Number(e.target.value))}
+            className="h-2 w-full min-w-0 flex-1 cursor-pointer accent-primary"
+          />
+          <span className="shrink-0 w-9 text-right text-sm font-medium tabular-nums text-foreground">
+            {props.minScore}
+          </span>
+        </div>
+      </div>
       <label className="inline-flex items-center gap-2 text-sm text-muted-foreground">
         <input
           type="checkbox"
