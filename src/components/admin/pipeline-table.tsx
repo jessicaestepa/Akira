@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { DealActivityLog, SellerLead } from "@/lib/supabase/types";
@@ -33,6 +34,28 @@ function scoreColor(score: number): string {
   return "text-red-500";
 }
 
+function dealSourceLabel(src: string | null | undefined): string {
+  const s = src ?? "organic";
+  if (s === "organic") return "Organic";
+  if (s === "flippa") return "Flippa";
+  if (s === "acquire") return "Acquire";
+  if (s === "empire_flippers") return "Empire Flippers";
+  if (s === "bizbuysell") return "BizBuySell";
+  if (s === "manual") return "Manual";
+  return s;
+}
+
+function dealSourceBadgeClass(src: string | null | undefined): string {
+  const s = src ?? "organic";
+  if (s === "organic") return "border-emerald-600/40 bg-emerald-50 text-emerald-900";
+  if (s === "flippa") return "border-sky-600/40 bg-sky-50 text-sky-900";
+  if (s === "acquire") return "border-violet-600/40 bg-violet-50 text-violet-900";
+  if (s === "empire_flippers") return "border-amber-600/40 bg-amber-50 text-amber-950";
+  if (s === "bizbuysell") return "border-red-600/40 bg-red-50 text-red-900";
+  if (s === "manual") return "border-border bg-muted text-foreground";
+  return "border-border bg-muted text-foreground";
+}
+
 function calcMultiple(s: SellerLead): number | null {
   const asking = estimateAskingPrice(s);
   const annualRev = estimateAnnualRevenue(s);
@@ -59,9 +82,14 @@ export function PipelineTable({ sellers, activityBySeller }: Props) {
   const [search, setSearch] = useState("");
   const [stage, setStage] = useState("all");
   const [businessType, setBusinessType] = useState("");
+  const [dealSource, setDealSource] = useState("all");
   const [starredOnly, setStarredOnly] = useState(false);
   const [minScore, setMinScore] = useState(0);
   const [sortBy, setSortBy] = useState("score");
+
+  useEffect(() => {
+    setRows(sellers);
+  }, [sellers]);
 
   const selectedSeller = rows.find((s) => s.id === selectedSellerId) ?? null;
 
@@ -74,6 +102,7 @@ export function PipelineTable({ sellers, activityBySeller }: Props) {
           ? (s.business_type ?? "").toLowerCase().includes(businessType.toLowerCase())
           : true
       )
+      .filter((s) => (dealSource === "all" ? true : (s.deal_source ?? "organic") === dealSource))
       .filter((s) => (starredOnly ? s.is_starred : true))
       .filter((s) => s.deal_score >= minScore)
       .filter((s) => {
@@ -92,7 +121,7 @@ export function PipelineTable({ sellers, activityBySeller }: Props) {
           return (displayMonthlyRevenue(b) ?? 0) - (displayMonthlyRevenue(a) ?? 0);
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       });
-  }, [rows, stage, businessType, starredOnly, minScore, search, sortBy]);
+  }, [rows, stage, businessType, dealSource, starredOnly, minScore, search, sortBy]);
 
   async function updateSeller(id: string, patch: Partial<SellerLead>) {
     const res = await fetch(`/api/admin/pipeline/seller/${id}`, {
@@ -137,6 +166,8 @@ export function PipelineTable({ sellers, activityBySeller }: Props) {
         setStage={setStage}
         businessType={businessType}
         setBusinessType={setBusinessType}
+        dealSource={dealSource}
+        setDealSource={setDealSource}
         starredOnly={starredOnly}
         setStarredOnly={setStarredOnly}
         search={search}
@@ -152,6 +183,7 @@ export function PipelineTable({ sellers, activityBySeller }: Props) {
               <th className="px-3 py-2">★</th>
               <th className="px-3 py-2">Score</th>
               <th className="px-3 py-2">Company</th>
+              <th className="px-3 py-2">Source</th>
               <th className="px-3 py-2">Type</th>
               <th className="px-3 py-2">Revenue</th>
               <th className="px-3 py-2">Asking</th>
@@ -193,8 +225,28 @@ export function PipelineTable({ sellers, activityBySeller }: Props) {
                     {s.deal_score}
                   </td>
                   <td className="px-3 py-2">
-                    <p className="font-medium">{s.company_name}</p>
-                    <p className="text-xs text-muted-foreground">{s.country}</p>
+                    <div className="flex items-start gap-2">
+                      <div>
+                        <p className="font-medium">{s.company_name}</p>
+                        <p className="text-xs text-muted-foreground">{s.country}</p>
+                      </div>
+                      {s.source_url ? (
+                        <a
+                          href={s.source_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-0.5 shrink-0 text-muted-foreground hover:text-foreground"
+                          title="View original listing"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </a>
+                      ) : null}
+                    </div>
+                  </td>
+                  <td className="px-3 py-2">
+                    <Badge variant="outline" className={`text-xs font-normal ${dealSourceBadgeClass(s.deal_source)}`}>
+                      {dealSourceLabel(s.deal_source)}
+                    </Badge>
                   </td>
                   <td className="px-3 py-2">{s.business_type}</td>
                   <td className="px-3 py-2">{formatCurrency(displayMonthlyRevenue(s))}</td>

@@ -5,6 +5,8 @@ interface PipelineFiltersProps {
   setStage: (value: string) => void;
   businessType: string;
   setBusinessType: (value: string) => void;
+  dealSource: string;
+  setDealSource: (value: string) => void;
   starredOnly: boolean;
   setStarredOnly: (value: boolean) => void;
   search: string;
@@ -40,6 +42,19 @@ export function PipelineFilters(props: PipelineFiltersProps) {
         value={props.businessType}
         onChange={(e) => props.setBusinessType(e.target.value)}
       />
+      <select
+        className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+        value={props.dealSource}
+        onChange={(e) => props.setDealSource(e.target.value)}
+      >
+        <option value="all">All sources</option>
+        <option value="organic">Organic</option>
+        <option value="flippa">Flippa</option>
+        <option value="acquire">Acquire</option>
+        <option value="empire_flippers">Empire Flippers</option>
+        <option value="bizbuysell">BizBuySell</option>
+        <option value="manual">Manual</option>
+      </select>
       <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center xl:col-span-2">
         <span className="shrink-0 text-sm text-muted-foreground whitespace-nowrap">
           Min score

@@ -1,3 +1,11 @@
+export type LeadSource =
+  | "organic"
+  | "flippa"
+  | "acquire"
+  | "empire_flippers"
+  | "bizbuysell"
+  | "manual";
+
 export type LeadStatus =
   | "new"
   | "qualified"
@@ -45,6 +53,12 @@ export interface SellerLead {
   is_starred: boolean;
   last_scored_at: string | null;
   lp_card_generated: boolean;
+  /** Pipeline origin; defaults to organic when column not migrated yet */
+  deal_source?: LeadSource | null;
+  source_url?: string | null;
+  source_listing_id?: string | null;
+  source_data?: Record<string, unknown> | null;
+  imported_at?: string | null;
 }
 
 export interface BuyerLead {
@@ -92,7 +106,8 @@ export interface DealActivityLog {
     | "score_update"
     | "note_added"
     | "lp_card_generated"
-    | "starred";
+    | "starred"
+    | "deal_imported";
   details: Record<string, unknown>;
   created_at: string;
 }
