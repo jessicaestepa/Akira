@@ -80,7 +80,7 @@ export function LpDealCard({ data }: Props) {
 
         <div>
           <p className="text-sm font-medium mb-2">Thesis Fit Score: {data.thesisScore}/100</p>
-          <ScoreBreakdown breakdown={data.breakdown} />
+          <ScoreBreakdown breakdown={data.breakdown} headlineTotal={data.thesisScore} />
         </div>
 
         <div>

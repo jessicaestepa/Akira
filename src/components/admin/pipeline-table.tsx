@@ -3,12 +3,13 @@
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import type { DealActivityLog, SellerLead, SellerScoreBreakdownStored } from "@/lib/supabase/types";
+import type { DealActivityLog, SellerLead } from "@/lib/supabase/types";
 import {
   estimateAnnualRevenue,
   estimateAskingPrice,
   estimateMonthlyRevenue,
 } from "@/lib/seller-financials";
+import { parseStoredScoreBreakdown } from "@/lib/score-breakdown-parse";
 import { PipelineFilters } from "./pipeline-filters";
 import { DealDetailPanel } from "./deal-detail-panel";
 
@@ -27,7 +28,7 @@ function formatCurrency(value: number | null | undefined): string {
 }
 
 function scoreColor(score: number): string {
-  if (score > 70) return "text-emerald-600";
+  if (score >= 70) return "text-emerald-600";
   if (score >= 40) return "text-amber-600";
   return "text-red-500";
 }
@@ -51,15 +52,6 @@ function displayAsking(s: SellerLead): number | null {
   return estimateAskingPrice(s);
 }
 
-function storedFlags(breakdown: SellerScoreBreakdownStored | null | undefined): {
-  flags: string[];
-  redFlags: string[];
-} {
-  if (!breakdown) return { flags: [], redFlags: [] };
-  const flags = Array.isArray(breakdown.flags) ? breakdown.flags : [];
-  const redFlags = Array.isArray(breakdown.redFlags) ? breakdown.redFlags : [];
-  return { flags, redFlags };
-}
 
 export function PipelineTable({ sellers, activityBySeller }: Props) {
   const [rows, setRows] = useState<SellerLead[]>(sellers);
@@ -172,8 +164,9 @@ export function PipelineTable({ sellers, activityBySeller }: Props) {
           <tbody>
             {filtered.map((s) => {
               const multiple = calcMultiple(s);
-              const breakdown = s.score_breakdown ?? {};
-              const { flags: thesisFlags, redFlags: thesisRed } = storedFlags(breakdown);
+              const breakdown = parseStoredScoreBreakdown(s.score_breakdown);
+              const thesisFlags = breakdown.flags ?? [];
+              const thesisRed = breakdown.redFlags ?? [];
               const fallbackGood = [
                 breakdown.businessType >= 20 ? "SaaS fit" : null,
                 breakdown.marginProfile >= 10 ? "High margin" : null,

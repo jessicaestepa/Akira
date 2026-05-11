@@ -8,6 +8,7 @@ import {
   estimateAskingPrice,
   estimateMonthlyRevenue,
   normalizeSlug,
+  parseMoneyField,
 } from "@/lib/seller-financials";
 
 export interface DealScore {
@@ -76,10 +77,41 @@ export function canonicalBusinessType(raw: string | null | undefined): string {
 
 function canonicalProfitability(raw: string | null | undefined): string {
   const n = normalizeSlug(raw);
+  if (!n) return "";
   if (n === "profitable") return "profitable";
   if (n === "break_even" || n === "breakeven") return "break_even";
   if (n === "not_profitable" || (n.includes("not") && n.includes("profit"))) return "not_profitable";
   return n;
+}
+
+/** Merge alternate API/DB field names and coerce numeric strings before scoring. */
+function normalizeSellerForScoring(seller: SellerRecord): SellerRecord {
+  const r = seller as Record<string, unknown>;
+  const pickStr = (...candidates: unknown[]): string | null | undefined => {
+    for (const c of candidates) {
+      if (typeof c === "string" && c.trim()) return c;
+    }
+    return undefined;
+  };
+  const pickNum = (...candidates: unknown[]): number | null | undefined => {
+    for (const c of candidates) {
+      const n = parseMoneyField(c);
+      if (n != null && !Number.isNaN(n)) return n;
+    }
+    return undefined;
+  };
+
+  return {
+    ...seller,
+    business_type:
+      pickStr(seller.business_type, r.businessType, r.type, r.category) ?? seller.business_type,
+    monthly_revenue: pickNum(seller.monthly_revenue, r.monthlyRevenue, r.revenue) ?? seller.monthly_revenue,
+    annual_revenue_optional:
+      pickNum(seller.annual_revenue_optional, r.annualRevenue, r.annual_revenue) ??
+      seller.annual_revenue_optional,
+    monthly_profit: pickNum(seller.monthly_profit, r.monthlyProfit, r.monthly_profit) ?? seller.monthly_profit,
+    asking_price: pickNum(seller.asking_price, r.askingPrice, r.price, r.sale_price) ?? seller.asking_price,
+  };
 }
 
 function businessTypeScore(seller: SellerRecord, flags: string[]): number {
@@ -87,10 +119,25 @@ function businessTypeScore(seller: SellerRecord, flags: string[]): number {
   const base = BUSINESS_TYPE_SCORES[businessType] ?? 3;
   if (base >= 20) flags.push("Software aligned");
   if (businessType === "saas") flags.push("SaaS");
+  if (businessType === "marketplace") flags.push("Marketplace/Platform");
   return base;
 }
 
 function recurringRevenueScore(seller: SellerRecord, _flags: string[], redFlags: string[]): number {
+  const monthly = estimateMonthlyRevenue(seller);
+  const strongMrr = monthly !== null && monthly >= 5000;
+
+  if (!strongMrr) {
+    if (monthly !== null && monthly > 0 && monthly < 5000) {
+      redFlags.push("Low revenue (<$5K/mo)");
+    } else if (monthly === null) {
+      redFlags.push("Revenue not specified");
+    } else if (monthly !== null && monthly <= 0) {
+      redFlags.push("Pre-revenue or no MRR signal");
+    }
+    return 3;
+  }
+
   const businessType = canonicalBusinessType(seller.business_type);
   const recurringFriendly = ["saas", "fintech", "healthtech", "edtech", "marketplace"];
   const maybeRecurring = ["agency", "ecommerce"];
@@ -105,6 +152,9 @@ function recurringRevenueScore(seller: SellerRecord, _flags: string[], redFlags:
 
 function marginProfileScore(seller: SellerRecord, flags: string[], redFlags: string[]): number {
   const profitability = canonicalProfitability(seller.profitability_status);
+  if (!profitability) {
+    return 0;
+  }
   if (profitability === "profitable") {
     flags.push("Profitable");
     return 12;
@@ -175,7 +225,9 @@ function marketSizeScore(seller: SellerRecord): number {
   if (monthlyRevenue === null) return 4;
   if (monthlyRevenue > 50000) return 10;
   if (monthlyRevenue >= 10000) return 7;
-  if (monthlyRevenue >= 1000) return 4;
+  if (monthlyRevenue >= 5000) return 4;
+  if (monthlyRevenue >= 1000) return 2;
+  if (monthlyRevenue > 0) return 2;
   return 2;
 }
 
@@ -191,16 +243,29 @@ function sumBreakdown(breakdown: DealScoreBreakdown): number {
 }
 
 export function scoreDeal(seller: SellerRecord): DealScore {
+  const s = normalizeSellerForScoring(seller);
+
+  if (process.env.DEAL_SCORING_DEBUG === "1" || process.env.DEAL_SCORING_DEBUG === "true") {
+    const r = s as Record<string, unknown>;
+    console.log("=== SCORING DEBUG ===", s.id);
+    console.log("keys:", Object.keys(r));
+    console.log("business_type:", s.business_type, "type:", r.type, "businessType:", r.businessType);
+    console.log("monthly_revenue:", s.monthly_revenue, "revenue_range:", s.revenue_range);
+    console.log("annual_revenue_optional:", s.annual_revenue_optional, "annual_revenue:", r.annual_revenue);
+    console.log("asking_price:", s.asking_price, "asking_price_range:", s.asking_price_range);
+    console.log("profitability_status:", s.profitability_status);
+  }
+
   const flags: string[] = [];
   const redFlags: string[] = [];
 
   const breakdown: DealScoreBreakdown = {
-    businessType: businessTypeScore(seller, flags),
-    recurringRevenue: recurringRevenueScore(seller, flags, redFlags),
-    marginProfile: marginProfileScore(seller, flags, redFlags),
-    valuationMultiple: valuationMultipleScore(seller, flags, redFlags),
-    aiOpportunity: aiOpportunityScore(seller, flags),
-    marketSize: marketSizeScore(seller),
+    businessType: businessTypeScore(s, flags),
+    recurringRevenue: recurringRevenueScore(s, flags, redFlags),
+    marginProfile: marginProfileScore(s, flags, redFlags),
+    valuationMultiple: valuationMultipleScore(s, flags, redFlags),
+    aiOpportunity: aiOpportunityScore(s, flags),
+    marketSize: marketSizeScore(s),
   };
 
   const total = Math.max(0, Math.min(100, sumBreakdown(breakdown)));

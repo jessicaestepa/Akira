@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { SellerLead, DealActivityLog, DealScoreBreakdown } from "@/lib/supabase/types";
 import type { DealScoreForCard } from "@/lib/lp-card-generator";
+import { parseStoredScoreBreakdown } from "@/lib/score-breakdown-parse";
 import { ScoreBreakdown } from "./score-breakdown";
 import { LpDealCard } from "./lp-deal-card";
 import { buildLpDealCardData } from "@/lib/lp-card-generator";
@@ -38,27 +39,27 @@ export function DealDetailPanel({
   const [showCard, setShowCard] = useState(false);
 
   const score = useMemo<DealScoreForCard>(() => {
-    const raw = seller?.score_breakdown;
-    if (!raw) {
+    if (!seller) {
       return {
-        total: seller?.deal_score ?? 0,
+        total: 0,
         breakdown: EMPTY_BREAKDOWN,
         flags: [],
         redFlags: [],
       };
     }
+    const parsed = parseStoredScoreBreakdown(seller.score_breakdown);
     return {
       total: seller.deal_score ?? 0,
       breakdown: {
-        businessType: raw.businessType ?? 0,
-        recurringRevenue: raw.recurringRevenue ?? 0,
-        marginProfile: raw.marginProfile ?? 0,
-        valuationMultiple: raw.valuationMultiple ?? 0,
-        aiOpportunity: raw.aiOpportunity ?? 0,
-        marketSize: raw.marketSize ?? 0,
+        businessType: parsed.businessType,
+        recurringRevenue: parsed.recurringRevenue,
+        marginProfile: parsed.marginProfile,
+        valuationMultiple: parsed.valuationMultiple,
+        aiOpportunity: parsed.aiOpportunity,
+        marketSize: parsed.marketSize,
       },
-      flags: Array.isArray(raw.flags) ? raw.flags : [],
-      redFlags: Array.isArray(raw.redFlags) ? raw.redFlags : [],
+      flags: parsed.flags ?? [],
+      redFlags: parsed.redFlags ?? [],
     };
   }, [seller]);
 
@@ -77,7 +78,7 @@ export function DealDetailPanel({
         <div className="text-sm text-muted-foreground">
           {seller.business_type} • {seller.country} • score {seller.deal_score}/100
         </div>
-        <ScoreBreakdown breakdown={score.breakdown} />
+        <ScoreBreakdown breakdown={score.breakdown} headlineTotal={score.total} />
 
         {(score.flags.length > 0 || score.redFlags.length > 0) && (
           <div className="space-y-2">
