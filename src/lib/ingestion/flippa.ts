@@ -1,3 +1,11 @@
+/**
+ * Flippa ingestion — **HTTP JSON API** (`GET https://flippa.com/search.json?…`), not HTML scraping.
+ * Other marketplaces can use `POST /api/ingestion/webhook` (optional) with Apify or your own ETL.
+ *
+ * If Flippa returns errors from the serverless IP, try `FLIPPA_DEBUG_RESPONSE=true` and/or contact Flippa
+ * for a supported integration (e.g. https://developers.flippa.com/ if you have API credentials).
+ */
+
 import "server-only";
 
 import { parseMoneyField } from "@/lib/seller-financials";

@@ -176,6 +176,10 @@ export function IngestionControls({ sourceCounts, lastImportAt, onSellersUpdated
   return (
     <div className="mb-6 rounded-lg border bg-muted/20 p-4 text-sm">
       <p className="mb-2 font-semibold">Deal sources</p>
+      <p className="mb-3 text-xs text-muted-foreground">
+        Flippa sync uses Flippa&apos;s public JSON search API (not a scraper). Other sites can push deals via
+        the ingestion webhook if you use Apify or a custom exporter.
+      </p>
       <div className="mb-3 flex flex-wrap items-center gap-2">
         <Button type="button" disabled={syncing} onClick={syncFlippa}>
           {syncing ? "Syncing…" : "Sync Flippa"}
