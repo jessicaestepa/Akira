@@ -14,6 +14,19 @@ async function getNewDealCount(): Promise<number> {
   return count ?? 0;
 }
 
+async function getDiligenceCount(): Promise<number> {
+  try {
+    const { count } = await supabaseAdmin
+      .from("deal_diligence_reviews")
+      .select("*", { count: "exact", head: true })
+      .neq("status", "complete");
+
+    return count ?? 0;
+  } catch {
+    return 0;
+  }
+}
+
 export default async function AdminLayout({
   children,
 }: {
@@ -33,6 +46,7 @@ export default async function AdminLayout({
   }
 
   const newDeals = await getNewDealCount();
+  const activeDiligence = await getDiligenceCount();
   const pipelinePath = await getPipelinePath();
 
   return (
@@ -78,6 +92,17 @@ export default async function AdminLayout({
                 {newDeals > 0 && (
                   <span className="inline-flex min-w-5 h-5 items-center justify-center rounded-full bg-primary/15 text-primary text-xs px-1.5">
                     {newDeals}
+                  </span>
+                )}
+              </Link>
+              <Link
+                href="/admin/diligence"
+                className="text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-2"
+              >
+                Diligence
+                {activeDiligence > 0 && (
+                  <span className="inline-flex min-w-5 h-5 items-center justify-center rounded-full bg-primary/15 text-primary text-xs px-1.5">
+                    {activeDiligence}
                   </span>
                 )}
               </Link>

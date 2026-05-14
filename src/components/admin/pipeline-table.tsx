@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { ExternalLink } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { DealActivityLog, SellerLead } from "@/lib/supabase/types";
@@ -77,6 +78,7 @@ function displayAsking(s: SellerLead): number | null {
 
 
 export function PipelineTable({ sellers, activityBySeller }: Props) {
+  const router = useRouter();
   const [rows, setRows] = useState<SellerLead[]>(sellers);
   const [selectedSellerId, setSelectedSellerId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
@@ -138,6 +140,15 @@ export function PipelineTable({ sellers, activityBySeller }: Props) {
     if (!res.ok) throw new Error("Rescore failed");
     const payload = (await res.json()) as { sellers: SellerLead[] };
     setRows(payload.sellers);
+  }
+
+  async function startDiligence(id: string) {
+    const res = await fetch(`/api/admin/diligence/${id}`, { method: "POST" });
+    if (!res.ok) throw new Error("Diligence start failed");
+    setRows((current) =>
+      current.map((s) => (s.id === id ? { ...s, deal_stage: "in_due_diligence" } : s))
+    );
+    router.push(`/admin/diligence?seller=${id}`);
   }
 
   return (
@@ -263,6 +274,7 @@ export function PipelineTable({ sellers, activityBySeller }: Props) {
                       <option value="new">new</option>
                       <option value="reviewing">reviewing</option>
                       <option value="shortlisted">shortlisted</option>
+                      <option value="in_due_diligence">in_due_diligence</option>
                       <option value="lp_ready">lp_ready</option>
                       <option value="passed">passed</option>
                     </select>
@@ -282,14 +294,24 @@ export function PipelineTable({ sellers, activityBySeller }: Props) {
                     </div>
                   </td>
                   <td className="px-3 py-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="h-8 px-2"
-                      onClick={() => setSelectedSellerId(s.id)}
-                    >
-                      View
-                    </Button>
+                    <div className="flex flex-wrap gap-1">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="h-8 px-2"
+                        onClick={() => setSelectedSellerId(s.id)}
+                      >
+                        View
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={s.deal_stage === "in_due_diligence" ? "default" : "outline"}
+                        className="h-8 px-2"
+                        onClick={() => startDiligence(s.id)}
+                      >
+                        {s.deal_stage === "in_due_diligence" ? "Open DD" : "Start DD"}
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               );

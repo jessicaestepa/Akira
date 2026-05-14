@@ -4,7 +4,14 @@ import { supabaseAdmin } from "@/lib/supabase/client";
 import { readAdminSessionCookieValue } from "@/lib/auth/admin-session-cookie";
 import { verifySessionToken } from "@/lib/auth/session";
 
-const STAGE_VALUES = new Set(["new", "reviewing", "shortlisted", "lp_ready", "passed"]);
+const STAGE_VALUES = new Set([
+  "new",
+  "reviewing",
+  "shortlisted",
+  "in_due_diligence",
+  "lp_ready",
+  "passed",
+]);
 
 export async function PATCH(
   request: Request,

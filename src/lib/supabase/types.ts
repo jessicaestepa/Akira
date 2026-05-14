@@ -17,6 +17,27 @@ export type LeadStatus =
 
 export type DealStatus = "draft" | "live" | "archived";
 
+export type DealStage =
+  | "new"
+  | "reviewing"
+  | "shortlisted"
+  | "in_due_diligence"
+  | "lp_ready"
+  | "passed";
+
+export type DiligenceStatus =
+  | "not_started"
+  | "in_progress"
+  | "needs_followup"
+  | "cleared"
+  | "blocked";
+
+export type DiligenceRecommendation =
+  | "undecided"
+  | "continue"
+  | "pass"
+  | "lp_ready";
+
 /** Stored on seller_leads.score_breakdown (dimensions + thesis strings). */
 export type SellerScoreBreakdownStored = DealScoreBreakdown & {
   flags?: string[];
@@ -47,7 +68,7 @@ export interface SellerLead {
   consent_checkbox: boolean;
   status: LeadStatus;
   deal_score: number;
-  deal_stage: "new" | "reviewing" | "shortlisted" | "lp_ready" | "passed";
+  deal_stage: DealStage;
   thesis_fit_notes: string | null;
   score_breakdown: SellerScoreBreakdownStored;
   is_starred: boolean;
@@ -107,9 +128,58 @@ export interface DealActivityLog {
     | "note_added"
     | "lp_card_generated"
     | "starred"
-    | "deal_imported";
+    | "deal_imported"
+    | "diligence_started"
+    | "diligence_updated";
   details: Record<string, unknown>;
   created_at: string;
+}
+
+export interface DealDiligenceReview {
+  id: string;
+  seller_id: string;
+  status: "in_progress" | "blocked" | "complete";
+  recommendation: DiligenceRecommendation;
+  executive_summary: string | null;
+  primary_risk: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DealDiligenceChecklistItem {
+  id: string;
+  review_id: string;
+  category: string;
+  label: string;
+  status: DiligenceStatus;
+  notes: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DealDiligenceQuestion {
+  id: string;
+  review_id: string;
+  question: string;
+  answer: string | null;
+  status: "open" | "answered" | "closed";
+  owner: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DealDiligenceRisk {
+  id: string;
+  review_id: string;
+  title: string;
+  severity: "low" | "medium" | "high";
+  probability: "low" | "medium" | "high";
+  mitigation: string | null;
+  decision_impact: string | null;
+  status: "open" | "mitigated" | "accepted";
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Deal {

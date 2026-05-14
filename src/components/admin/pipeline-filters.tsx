@@ -33,6 +33,7 @@ export function PipelineFilters(props: PipelineFiltersProps) {
         <option value="new">New</option>
         <option value="reviewing">Reviewing</option>
         <option value="shortlisted">Shortlisted</option>
+        <option value="in_due_diligence">In due diligence</option>
         <option value="lp_ready">LP-ready</option>
         <option value="passed">Passed</option>
       </select>
