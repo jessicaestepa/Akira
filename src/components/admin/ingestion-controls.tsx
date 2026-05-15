@@ -4,6 +4,16 @@ import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import type { SellerLead } from "@/lib/supabase/types";
 
 const BUSINESS_TYPES = [
@@ -20,6 +30,30 @@ const BUSINESS_TYPES = [
 ] as const;
 
 const MANUAL_ORIGINS = ["Referral", "WhatsApp", "Email", "Conference", "Other"] as const;
+
+const DEFAULT_COUNTS = {
+  organic: 0,
+  flippa: 0,
+  acquire: 0,
+  empire_flippers: 0,
+  bizbuysell: 0,
+  manual: 0,
+} as const;
+
+type SourceCountKey = keyof typeof DEFAULT_COUNTS;
+
+const SOURCE_ROWS: Array<{ key: SourceCountKey; label: string; badgeClass: string }> = [
+  { key: "organic", label: "Organic", badgeClass: "border-emerald-600/30 bg-emerald-50 text-emerald-950" },
+  { key: "flippa", label: "Flippa", badgeClass: "border-sky-600/30 bg-sky-50 text-sky-950" },
+  { key: "acquire", label: "Acquire", badgeClass: "border-violet-600/30 bg-violet-50 text-violet-950" },
+  {
+    key: "empire_flippers",
+    label: "Empire Flippers",
+    badgeClass: "border-amber-600/30 bg-amber-50 text-amber-950",
+  },
+  { key: "bizbuysell", label: "BizBuySell", badgeClass: "border-red-600/30 bg-red-50 text-red-950" },
+  { key: "manual", label: "Manual", badgeClass: "border-border bg-muted text-foreground" },
+];
 
 interface Props {
   sourceCounts: Record<string, number>;
@@ -164,45 +198,99 @@ export function IngestionControls({ sourceCounts, lastImportAt, onSellersUpdated
       })
     : "—";
 
-  const sourceLine = [
-    `Organic (${sourceCounts.organic ?? 0})`,
-    `Flippa (${sourceCounts.flippa ?? 0})`,
-    `Acquire (${sourceCounts.acquire ?? 0})`,
-    `Empire Flippers (${sourceCounts.empire_flippers ?? 0})`,
-    `BizBuySell (${sourceCounts.bizbuysell ?? 0})`,
-    `Manual (${sourceCounts.manual ?? 0})`,
-  ].join(" · ");
+  const counts = { ...DEFAULT_COUNTS, ...sourceCounts } as Record<SourceCountKey, number>;
 
   return (
-    <div className="mb-6 rounded-lg border bg-muted/20 p-4 text-sm">
-      <p className="mb-2 font-semibold">Deal sources</p>
-      <p className="mb-3 text-xs text-muted-foreground">
-        Flippa sync uses Flippa&apos;s public JSON search API (not a scraper). Other sites can push deals via
-        the ingestion webhook if you use Apify or a custom exporter.
-      </p>
-      <div className="mb-3 flex flex-wrap items-center gap-2">
-        <Button type="button" disabled={syncing} onClick={syncFlippa}>
-          {syncing ? "Syncing…" : "Sync Flippa"}
-        </Button>
-        <Button type="button" variant="outline" onClick={() => setShowManual(true)}>
-          Manual entry
-        </Button>
-        <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
-          CSV upload
-        </Button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".csv,text/csv"
-          className="hidden"
-          onChange={(e) => onCsvSelected(e.target.files?.[0] ?? null)}
-        />
-      </div>
-      <p className="text-muted-foreground">
-        Last import logged: <span className="text-foreground">{lastLabel}</span>
-      </p>
-      <p className="mt-1 text-muted-foreground">{sourceLine}</p>
-      {message && <p className="mt-2 text-xs text-foreground">{message}</p>}
+    <>
+      <Card className="mb-6" size="sm">
+      <CardHeader className="border-b border-border/60 pb-3">
+        <CardTitle>Deal sources</CardTitle>
+        <CardDescription className="max-w-2xl">
+          Import listings into the pipeline. Flippa uses the public JSON search endpoint; other marketplaces
+          can POST batches to the ingestion webhook.
+        </CardDescription>
+        <CardAction>
+          <div className="text-right text-xs leading-tight">
+            <p className="text-muted-foreground">Last import</p>
+            <p className="font-medium tabular-nums text-foreground">{lastLabel}</p>
+          </div>
+        </CardAction>
+      </CardHeader>
+
+      <CardContent className="grid gap-6 pt-2 lg:grid-cols-[minmax(0,220px)_1fr] lg:items-start">
+        <div className="space-y-2">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Actions</p>
+          <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
+            <Button type="button" className="w-full sm:w-auto lg:w-full" disabled={syncing} onClick={syncFlippa}>
+              {syncing ? "Syncing…" : "Sync Flippa"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full sm:w-auto lg:w-full"
+              onClick={() => setShowManual(true)}
+            >
+              Manual entry
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full sm:w-auto lg:w-full"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              CSV upload
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv,text/csv"
+              className="hidden"
+              onChange={(e) => onCsvSelected(e.target.files?.[0] ?? null)}
+            />
+          </div>
+        </div>
+
+        <div className="min-w-0 space-y-2">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">By source</p>
+          <div className="flex flex-wrap gap-2">
+            {SOURCE_ROWS.map(({ key, label, badgeClass }) => (
+              <Badge
+                key={key}
+                variant="outline"
+                className={`gap-1.5 px-2.5 py-1 text-xs font-normal ${badgeClass}`}
+              >
+                <span>{label}</span>
+                <span className="font-semibold tabular-nums">{counts[key]}</span>
+              </Badge>
+            ))}
+          </div>
+        </div>
+      </CardContent>
+
+      {message ? (
+        <div className="border-t border-border/60 bg-muted/30 px-4 py-3 text-xs text-foreground">
+          {message}
+        </div>
+      ) : null}
+
+      <CardFooter className="flex-col items-stretch gap-2 border-t border-border/60 py-3">
+        <details className="group text-xs text-muted-foreground">
+          <summary className="cursor-pointer list-none font-medium text-foreground/90 outline-none [&::-webkit-details-marker]:hidden">
+            <span className="underline decoration-muted-foreground/40 underline-offset-2 group-open:no-underline">
+              How ingestion works
+            </span>
+          </summary>
+          <p className="mt-2 max-w-3xl leading-relaxed">
+            Flippa sync calls Flippa&apos;s public JSON search API (no HTML scraping). For Acquire, Empire
+            Flippers, or BizBuySell, send normalized payloads to{" "}
+            <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">POST /api/ingestion/webhook</code>{" "}
+            with header <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">x-webhook-secret</code>{" "}
+            set to <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">INGESTION_WEBHOOK_SECRET</code>
+            .
+          </p>
+        </details>
+      </CardFooter>
+      </Card>
 
       {showManual && (
         <div
@@ -327,6 +415,6 @@ export function IngestionControls({ sourceCounts, lastImportAt, onSellersUpdated
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
